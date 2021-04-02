@@ -4,8 +4,8 @@
 typedef struct wf_item{
         char *word;
         int count;
-        int freq;
-        int hashcode;
+        double freq;
+        unsigned long hashcode;
         struct wf_item *next;
 } wf_item;
 
@@ -20,14 +20,14 @@ typedef struct hashtable {
 } hashtable;
 
 /**
- * takes in a string and the length of the string and makes a hashcode for it
+ * takes in a string makes a hashcode for it
  */
-int hash_func(char *, int);
+unsigned long hash_func(char *);
 
 /**
- * takes in a hashtable and the word to be inserted, alongside an int for use with hash_func
- */
-int hash_insert(hashtable *, char *, int);
+ * takes in a hashtable and the word to be inserted
+ * */
+int hash_insert(hashtable *, char *);
 
 /**
  * takes in a hashtable and will attempt to rehash, moving entries into a larger 2x row size array
@@ -39,3 +39,8 @@ int hash_rehash(hashtable *);
  * only use when you no longer want a hashtable at all. hash_rehash will do the job of freeing the space of the old hashtable without destroying the entries
  */
 int hash_destroy(hashtable *);
+
+/**
+ * create a hashtable, initializing all fields to 0 except for filename, with some length no_rows and some double y
+ */
+hashtable *hash_create(char*, int, double);
