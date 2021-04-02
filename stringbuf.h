@@ -1,9 +1,9 @@
-typedef struct {
-        size_t length;
-        size_t used;
+typedef struct stringbuf {
+        int length;
+        int used;
         char *data;
 } stringbuf;
 
-stringbuf *sb_init(size_t);
+stringbuf *sb_init(int);
 void sb_destroy(stringbuf *);
 int sb_append(stringbuf *, char);
