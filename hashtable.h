@@ -44,3 +44,8 @@ int hash_destroy(hashtable *);
  * create a hashtable, initializing all fields to 0 except for filename, with some length no_rows and some double y
  */
 hashtable *hash_create(char*, int, double);
+
+/**
+ * actually computes the frequencies for words, which can only be done once we are finished adding words in
+ */
+int hash_comp_freq(hashtable *);

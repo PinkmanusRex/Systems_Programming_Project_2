@@ -3,8 +3,6 @@
 #include "stringbuf.h"
 #include <ctype.h>
 
-
-
 stringbuf *sb_init(int length){
         if (length < 10) {
                 length = 10;
@@ -49,36 +47,18 @@ int sb_append(stringbuf *list, char item){
         return EXIT_SUCCESS;
 }
 
-char *sb_get_clean_word(stringbuf *list){
-        int no_apost = 0;
-        for (int i = 0; i < list->used; i += 1) {
-                char c = (list->data)[i];
-                if (c == '\'') {
-                        no_apost += 1;
-                }
-        }
-        /** plus 1 for the null terminator */
-        int clean_word_len = (list->used) - no_apost + 1;
-        char *clean_word = malloc(sizeof(char)*clean_word_len);
-        if (!clean_word) {
+char *sb_get_lower_word(stringbuf *list){
+        char *lower_word = malloc(sizeof(char)*(list->used + 1));
+        /** returns NULL */
+        if (!lower_word) {
                 return 0;
         }
-        int i = 0;
-        int j = 0;
-        while (i < list->used) {
-                char c = (list->data)[i];
-                if (c == '\'') {
-                        i += 1;
-                        continue;
-                } else {
-                        c = tolower(c);
-                        clean_word[j] = c;
-                        i += 1;
-                        j += 1;
-                }
+        for (int i = 0; i < list->used; i += 1) {
+                /** uppercase alphabet will be lowercased, all else is returned same as is */
+                lower_word[i] = tolower((list->data)[i]);
         }
-        /** set used to 0 so as to "clean out" the buffer */
+        lower_word[list->used] = '\0';
         list->used = 0;
-        clean_word[clean_word_len] = '\0';
-        return clean_word;
+        list->data[0] = '\0';
+        return lower_word;
 }

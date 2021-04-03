@@ -39,6 +39,8 @@ int hash_insert(hashtable *table, char *word) {
                 while (ptr) {
                         if (strcmp(ptr->word, word)==0) {
                                 ptr->count += 1;
+                                /** word was found in the table, but we do not need to store the duplicate word in the heap */
+                                free(word);
                                 break;
                         } else {
                                 prev = ptr;
@@ -98,5 +100,22 @@ int hash_rehash(hashtable *table){
         /** free the old table since it won't be used anymore, and replace it with the new table */
         free(table->data);
         table->data = new_data;
+        return EXIT_SUCCESS;
+}
+
+int hash_comp_freq(hashtable *table) {
+        for (int i = 0; i < table->no_rows; i += 1) {
+                wf_item *row = (table->data)[i];
+                if (!row) {
+                        continue;
+                }
+                else {
+                        wf_item *ptr = row;
+                        while (ptr) {
+                                ptr->freq = (double)ptr->count/table->no_words;
+                                ptr = ptr->next;
+                        }
+                }
+        }
         return EXIT_SUCCESS;
 }
