@@ -142,3 +142,24 @@ int hash_destroy(hashtable *table) {
         free(table);
         return EXIT_SUCCESS;
 }
+
+hashtable *hash_init_table(char *file_name, double y, int no_rows) {
+        hashtable *table = malloc(sizeof(hashtable));
+        if (!table) {
+                return 0;
+        }
+        table->file_name = file_name;
+        table->no_words = 0;
+        table->no_entries = 0;
+        table->y = y;
+        table->next = 0;
+        table->data = malloc(sizeof(wf_item *) * no_rows);
+        if (!table->data) {
+                free(table);
+                return 0;
+        }
+        for (int i = 0; i < no_rows; i += 1) {
+                table->data[i] = 0;
+        }
+        return table;
+}

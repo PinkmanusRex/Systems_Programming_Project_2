@@ -17,15 +17,18 @@ typedef struct hashtable {
         /** y used to decide when to rehash, in an attempt to maintain O(y) lookup time */
         double y;
         wf_item **data;
+        struct hashtable *next;
 } hashtable;
 
 /**
  * takes in a string makes a hashcode for it
+ * RETURN: the hashcode generated from the string
  */
 unsigned long hash_func(char *);
 
 /**
  * takes in a hashtable and the word to be inserted
+ * RETURN: EXIT_FAILURE if malloc failed, else EXIT_SUCCESS;
  * */
 int hash_insert(hashtable *, char *);
 
@@ -50,3 +53,7 @@ hashtable *hash_create(char*, int, double);
  * actually computes the frequencies for words, which can only be done once we are finished adding words in
  */
 int hash_comp_freq(hashtable *);
+
+/** creates the hashtable with a filename, a y value, and a number of starting rows */
+/** RETURN: either a hashtable or NULL on the condition of malloc failure */
+hashtable *hash_init_table(char *, double, int);
