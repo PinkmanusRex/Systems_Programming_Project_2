@@ -37,6 +37,7 @@ int hash_rehash(hashtable *);
 
 /**
  * only use when you no longer want a hashtable at all. hash_rehash will do the job of freeing the space of the old hashtable without destroying the entries
+ * note, it will not only destroy all entries and the hashtable itself, but also all the strings in the hashtable as well
  */
 int hash_destroy(hashtable *);
 

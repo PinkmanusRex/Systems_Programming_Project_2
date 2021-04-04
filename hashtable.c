@@ -119,3 +119,26 @@ int hash_comp_freq(hashtable *table) {
         }
         return EXIT_SUCCESS;
 }
+
+int hash_destroy(hashtable *table) {
+        free(table->file_name);
+        for (int i = 0; i < table->no_rows; i += 1) {
+                wf_item *row = table->data[i];
+                if (!row) {
+                        continue;
+                }
+                else {
+                        wf_item *ptr = row;
+                        wf_item *next_it = 0;
+                        while(ptr) {
+                                next_it = ptr->next;
+                                free(ptr->word);
+                                free(ptr);
+                                ptr = next_it;
+                        }
+                }
+        }
+        free(table->data);
+        free(table);
+        return EXIT_SUCCESS;
+}
