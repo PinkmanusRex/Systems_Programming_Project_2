@@ -13,7 +13,7 @@
 
 
 int main(int argc, char** argv){
-    
+
 }
 
 
@@ -77,7 +77,6 @@ void directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* file
             temp->next = files->next;
             files->value = currentPath;
             files->next = temp;
-            free(currentPath);
         }
         else if(S_ISDIR(entryStat.st_mode)){
             // If it has read perms then add it.
@@ -96,11 +95,10 @@ void directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* file
             temp->next = dirs->next;
             dirs->value = currentPath;
             dirs->next = temp;
-
-            free(currentPath);
         }
     }
     closedir(dirp);
+    free(dequeuedItem);
     return;
 }
 
