@@ -13,7 +13,7 @@
 
 
 int main(int argc, char** argv){
-
+    
 }
 
 
@@ -24,7 +24,7 @@ int main(int argc, char** argv){
     Parameter fileSuffix such as ".txt" need for comparison of directory entries that are files.
     Return: we populate files and dirs by having a pointer to them, nothing returned.
 */
-void directoryFunction_r(char* dequeuedItem, Node** files, Node** dirs, char* fileSuffix){
+void directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileSuffix){
     DIR* dirp = opendir(dequeuedItem);
     // Check if we have perms to read it.
     if(dirp == NULL){
@@ -72,10 +72,12 @@ void directoryFunction_r(char* dequeuedItem, Node** files, Node** dirs, char* fi
             }
             
             // If we can open it and has matching suffix then add it to files
-            Node* temp = (Node*)malloc(sizeof(Node));
-            temp->value = currentPath;
-            temp->next = *files;
-            *files = temp;
+            Node* temp = (Node *)malloc(sizeof(Node));
+            temp->value = files->value;
+            temp->next = files->next;
+            files->value = currentPath;
+            files->next = temp;
+            free(currentPath);
         }
         else if(S_ISDIR(entryStat.st_mode)){
             // If it has read perms then add it.
@@ -89,10 +91,11 @@ void directoryFunction_r(char* dequeuedItem, Node** files, Node** dirs, char* fi
             
 
             // Add currentPath to dir linkedlist.
-            Node* temp = (Node*)malloc(sizeof(Node));
-            temp->value = currentPath;
-            temp->next = *dirs;
-            *dirs = temp;
+            Node* temp = (Node *)malloc(sizeof(Node));
+            temp->value = dirs->value;
+            temp->next = dirs->next;
+            dirs->value = currentPath;
+            dirs->next = temp;
 
             free(currentPath);
         }
@@ -123,15 +126,15 @@ int endsWithSuffix(char* fileSuffix, char* fileName){
 char* generateFilePath(char* directoryName, char* currPath)
 {
     strbuf_t path;
-    sb_init(&path, 10);
-    sb_concat(&path, directoryName);
-    sb_append(&path, '/');
-    sb_concat(&path, currPath);
+    sb_initk(&path, 10);
+    sb_concatk(&path, directoryName);
+    sb_appendk(&path, '/');
+    sb_concatk(&path, currPath);
 
     char* returnString = malloc(sizeof(char)* (path.used+1));
     strcpy(returnString, path.data);
     
-    sb_destroy(&path);
+    sb_destroyk(&path);
     return returnString;
 }
 

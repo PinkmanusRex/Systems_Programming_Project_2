@@ -1,16 +1,24 @@
-struct node{
+typedef struct{
     char* value;
-    struct node* next;
-}; typedef struct node Node;
+    Node* next;
+} Node;
 
-Node* insertNode(Node *head, char* val)
-{
-    Node* temp = (Node*)malloc(sizeof(Node));
-    temp->value = val;
-    temp->next = head;
-    return temp;
-}
 
-void directoryFunction_r(char* dequeuedItem, Node** files, Node** dirs, char* fileSuffix);
+/* The only item we can dequeue from a Directory Queue is a directory
+    Parameter dequeuedItem refers to the name of the directory dequeued.
+    Parameter files refers to the arraylist of files
+    Parameter dirs refers to the arraylist of directories.
+    Parameter fileSuffix such as ".txt" need for comparison of directory entries that are files.
+    Return: we populate files and dirs by having a pointer to them, nothing returned.
+*/
+void directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileSuffix);
+
+/*  Generate file path relative to current working directory for deqeued item 
+    Implicitly reentrant
+*/
 char* generateFilePath(char* directoryName, char* currPath);
-int endsWithSuffix(char* fileName, char* fileSuffix);
+
+/*  endsWithSuffix(".txt", "coronavirus.txt") returns 1.
+    If fileName doesn't end with fileSuffix, returns 0
+*/
+int endsWithSuffix(char* fileSuffix, char* fileName);

@@ -7,13 +7,13 @@
 #define DEBUG 0
 #endif
 
-int sb_reset(strbuf_t *sb){
+int sb_resetk(strbuf_t *sb){
     sb->used = 0;
     sb->data[sb->used] = '\0';
     return 0;
 }
 
-int sb_init(strbuf_t *sb, size_t length)
+int sb_initk(strbuf_t *sb, size_t length)
 {
     if(length < 1){
         return 1;
@@ -29,7 +29,7 @@ int sb_init(strbuf_t *sb, size_t length)
     return 0;
 }
 
-int sb_remove(strbuf_t *sb, char* item){
+int sb_removek(strbuf_t *sb, char* item){
     // if nothing to remove, can't return anything
     if(sb->used == 0)
         return 1;
@@ -42,12 +42,12 @@ int sb_remove(strbuf_t *sb, char* item){
     return 0;
 }
 
-void sb_destroy(strbuf_t *sb)
+void sb_destroyk(strbuf_t *sb)
 {
     free(sb->data);
 }
 
-int sb_append(strbuf_t *sb, char item){
+int sb_appendk(strbuf_t *sb, char item){
     if((sb->used+1) == sb->length){
         size_t size = sb->length * 2;
         char *p = realloc(sb->data, sizeof(char)* size);
@@ -71,7 +71,7 @@ int sb_append(strbuf_t *sb, char item){
     Assume that str is a null-terminated C string. 
     Return 0 if successful, and 1 otherwise.
 */
-int sb_concat(strbuf_t *sb, char *str){
+int sb_concatk(strbuf_t *sb, char *str){
     if((sb->used + strlen(str)) >= sb->length){
         size_t size = ((sb->used + strlen(str) + 1) > 2 * sb->length) ? (sb->used + strlen(str) + 1) : 2*sb->length;
         char *p = realloc(sb->data, sizeof(char)* size);
@@ -93,7 +93,7 @@ int sb_concat(strbuf_t *sb, char *str){
     return 0;
 }
 
-int sb_insert(strbuf_t *sb, int index, char item){
+int sb_insertk(strbuf_t *sb, int index, char item){
     if(index <= sb->used){
         ++sb->used;
         if(sb->used == sb->length){
