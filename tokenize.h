@@ -1,3 +1,6 @@
+#include "stringbuf.h"
+#include "hashtable.h"
+
 enum word_states {wEmpty, wIncomplete, wComplete};
 
 /** 
