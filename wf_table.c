@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "hashtable.h"
+#include "wf_table.h"
 
 unsigned long hash_func(char *word){
         /** credit to djb2 algorithm by dan bernstein */
@@ -15,7 +15,7 @@ unsigned long hash_func(char *word){
         return hash;
 }
 
-int hash_insert(hashtable *table, char *word) {
+int hash_insert(wf_table *table, char *word) {
         unsigned long hash = hash_func(word);
         int idx = (int)(hash % table->no_rows);
         wf_item *row = (table->data)[idx];
@@ -72,7 +72,7 @@ int hash_insert(hashtable *table, char *word) {
         return EXIT_SUCCESS;
 }
 
-int hash_rehash(hashtable *table){
+int hash_rehash(wf_table *table){
         int new_no_rows = 2 * table->no_rows;
         wf_item **new_data = malloc(sizeof(wf_item *)*new_no_rows);
         if (!new_data){
@@ -103,7 +103,8 @@ int hash_rehash(hashtable *table){
         return EXIT_SUCCESS;
 }
 
-int hash_comp_freq(hashtable *table) {
+/**
+int hash_comp_freq(wf_table *table) {
         for (int i = 0; i < table->no_rows; i += 1) {
                 wf_item *row = (table->data)[i];
                 if (!row) {
@@ -119,8 +120,19 @@ int hash_comp_freq(hashtable *table) {
         }
         return EXIT_SUCCESS;
 }
+*/
 
-int hash_destroy(hashtable *table) {
+/** method based on the list portion of wf_table */
+int hash_comp_freq(wf_table *table) {
+        for (int i = 0; i < table->no_entries; i += 1) {
+                wf_item *entry = table->list[i];
+                entry->freq = (double)entry->count/table->no_words;
+        }
+        return EXIT_SUCCESS;
+}
+
+/**
+int hash_destroy(wf_table *table) {
         free(table->file_name);
         for (int i = 0; i < table->no_rows; i += 1) {
                 wf_item *row = table->data[i];
@@ -138,16 +150,32 @@ int hash_destroy(hashtable *table) {
                         }
                 }
         }
+        free(table->list);
         free(table->data);
         free(table);
         return EXIT_SUCCESS;
 }
+*/
 
-hashtable *hash_init_table(char *file_name, double y, int no_rows) {
-        hashtable *table = malloc(sizeof(hashtable));
+/** method based on assumption that the actual hashtable was freed up, and all is left is the list */
+int hash_destroy(wf_table *table) {
+        for (int i = 0; i < table->no_entries; i += 1) {
+                wf_item *entry = table->list[i];
+                free(entry->word);
+                free(entry);
+        }
+        free(table->list);
+        free(table->file_name);
+        free(table);
+        return EXIT_SUCCESS;
+}
+
+wf_table *hash_init_table(char *file_name, double y, int no_rows) {
+        wf_table *table = malloc(sizeof(wf_table));
         if (!table) {
                 return 0;
         }
+        table->list = 0;
         table->file_name = file_name;
         table->no_words = 0;
         table->no_entries = 0;
@@ -162,4 +190,53 @@ hashtable *hash_init_table(char *file_name, double y, int no_rows) {
                 table->data[i] = 0;
         }
         return table;
+}
+
+double hash_get(wf_table *table, char *word) {
+    unsigned long hash = hash_func(word);
+    int idx = (int)(hash % table->no_rows);
+    wf_item *row = table->data[idx];
+    if (!row) {
+            return 0;
+    }
+    else {
+            wf_item *ptr = row;
+            while (ptr) {
+                    if (strcmp(ptr->word, word)==0) {
+                            return ptr->freq;
+                    }
+                    ptr = ptr->next;
+            }
+            return 0;
+    }
+}
+
+int hash_lexical_list(wf_table *table) {
+        table->list = malloc(sizeof(wf_item *) * table->no_entries);
+        if (!table->list) {
+                return EXIT_FAILURE;
+        }
+        int j = 0;
+        for (int i = 0; i < table->no_rows; i += 1) {
+                wf_item *row = table->data[i];
+                if (!row) {
+                        continue;
+                }
+                else {
+                        wf_item *ptr = row;
+                        while (ptr) {
+                                table->list[j] = ptr;
+                                j += 1;
+                                ptr = ptr->next;
+                        }
+                }
+        }
+        qsort((void *)(table->list), table->no_entries, sizeof(wf_item *), wf_item_comparator);
+        return EXIT_SUCCESS;
+}
+
+int wf_item_comparator(const void *wf_1_void, const void *wf_2_void) {
+        wf_item *wf_1 = (wf_item *) wf_1_void;
+        wf_item *wf_2 = (wf_item *) wf_2_void;
+        return strcmp(wf_1->word, wf_2->word);
 }

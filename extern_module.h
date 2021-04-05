@@ -1,3 +1,5 @@
+#ifndef EXTERN_MODULE_H
+#define EXTERN_MODULE_H
 #include <pthread.h>
 
 /** the mutex's that protect access to no_waiting_dirs and no_waiting_files as well as the flags */
@@ -16,3 +18,4 @@ extern pthread_cond_t cond_file;
 /** flags that will let the threads determine whether to terminate or not */
 extern int dir_threads_terminate;
 extern int file_threads_terminate;
+#endif

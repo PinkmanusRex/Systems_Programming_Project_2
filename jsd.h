@@ -1,3 +1,5 @@
+#ifndef JSD_H
+#define JSD_H
 /** struct to hold the jsd data */
 typedef struct jsd_entry {
         char *file_1;
@@ -18,3 +20,4 @@ int jsd_destroy_list(jsd_entry **, int);
 int jsd_destroy_entry(jsd_entry *);
 
 int jsd_comparator(const void *, const void *);
+#endif

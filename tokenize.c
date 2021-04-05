@@ -3,11 +3,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "wf_table.h"
 #include "stringbuf.h"
-#include "hashtable.h"
 #include "tokenize.h"
 
-int tokenize(int fd, hashtable *table, stringbuf *list) {
+int tokenize(int fd, wf_table *table, stringbuf *list) {
         enum word_states word_state = wEmpty;
         int bytesRead = 0;
         char inter_buf[500];
@@ -58,6 +58,10 @@ int tokenize(int fd, hashtable *table, stringbuf *list) {
                         return EXIT_FAILURE;
                 }
         }
+        if (hash_lexical_list(table)==EXIT_FAILURE) {
+                return EXIT_FAILURE;
+        }
         hash_comp_freq(table);
+        free(table->data);
         return EXIT_SUCCESS;
 }
