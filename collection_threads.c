@@ -85,6 +85,91 @@ void *dir_thread_routine(void *arg){
                  * must track if anything was added to the directory queue
                  * must track if anything was added to the file queue
                  */
+                Node *files = malloc(sizeof(Node));
+                if (!files) {
+                        fprintf(stderr, "MALLOC FAILURE!!!");
+                        exit(EXIT_FAILURE);
+                }
+                Node *dirs = malloc(sizeof(Node));
+                if (!dirs) {
+                        fprintf(stderr, "MALLOC FAILURE!!!");
+                        exit(EXIT_FAILURE);
+                }
+                files->value = 0;
+                files->next = 0;
+                dirs->value = 0;
+                dirs->next = 0;
+                directoryFunction_r(dir->name, files, dirs, file_suffix);
+                int dirs_added = 0;
+                int files_added = 0;
+                Node *dirs_ptr = dirs;
+                Node *files_ptr = files;
+                while (dirs_ptr->value != 0) {
+                        if (sync_q_add(directory_queue, dirs_ptr->value)==EXIT_FAILURE){
+                                fprintf(stderr, "MALLOC FAILURE!!!");
+                                exit(EXIT_FAILURE);
+                        }
+                        dirs_added = 1;
+                        dirs_ptr = dirs_ptr->next;
+                }
+                mutex_status = pthread_mutex_lock(&dir_term_mutex);
+                if (mutex_status != 0){
+                        perror("ERROR!!!");
+                        exit(EXIT_FAILURE);
+                }
+                if (dirs_added) {
+                        mutex_status = pthread_cond_broadcast(&cond_dir);
+                        if (mutex_status != 0) {
+                                perror("ERROR!!!");
+                                exit(EXIT_FAILURE);
+                        }
+                }
+                mutex_status = pthread_mutex_unlock(&dir_term_mutex);
+                if (mutex_status != 0) {
+                        perror("ERROR!!!");
+                        exit(EXIT_FAILURE);
+                }
+                while (files_ptr->value != 0) {
+                        if (sync_q_add(file_queue, files_ptr->value)==EXIT_FAILURE){
+                                fprintf(stderr, "MALLOC FAILURE!!!");
+                                exit(EXIT_FAILURE);
+                        }
+                        files_added = 1;
+                        files_ptr = files_ptr->next;
+                }
+                mutex_status = pthread_mutex_lock(&file_term_mutex);
+                if (mutex_status != 0) {
+                        perror("ERROR!!!");
+                        exit(EXIT_FAILURE);
+                }
+                if (files_added) {
+                        mutex_status = pthread_cond_broadcast(&cond_file);
+                        if (mutex_status != 0) {
+                                perror("ERROR!!!");
+                                exit(EXIT_FAILURE);
+                        }
+                }
+                mutex_status = pthread_mutex_unlock(&file_term_mutex);
+                if (mutex_status != 0) {
+                        perror("ERROR!!!");
+                        exit(EXIT_FAILURE);
+                }
+                dirs_ptr = dirs;
+                Node *next_dir = 0;
+                files_ptr = files;
+                Node *next_file = 0;
+                while (dirs_ptr) {
+                        next_dir = dirs_ptr->next;
+                        free(dirs_ptr);
+                        dirs_ptr = next_dir;
+                }
+                while(files_ptr) {
+                        next_file = files_ptr->next;
+                        free(files_ptr);
+                        files_ptr = next_file;
+                }
+                free(dir->name);
+                free(dir);
         }
 }
 

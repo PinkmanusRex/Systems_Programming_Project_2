@@ -6,6 +6,9 @@
 #include "wf_table.h"
 #include "wf_repo.h"
 
+/** the suffix */
+extern char *file_suffix;
+
 /** the mutex's that protect access to no_waiting_dirs and no_waiting_files as well as the flags */
 extern pthread_mutex_t dir_term_mutex;
 extern pthread_mutex_t file_term_mutex;

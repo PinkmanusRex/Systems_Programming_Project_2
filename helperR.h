@@ -1,8 +1,7 @@
-struct node{
+typedef struct node{
     char* value;
     struct node* next;
-}; typedef struct node Node;
-
+} Node;
 
 /* The only item we can dequeue from a Directory Queue is a directory
     Parameter dequeuedItem refers to the name of the directory dequeued.
