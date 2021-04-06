@@ -15,6 +15,11 @@
 #include "wf_table.h"
 #include "helperR.h"
 #include "strbuf.h"
+#include "collection_threads.h"
+#include "debugger.h"
+#include "sync_queue.h"
+#include "extern_module.h"
+#include "wf_repo.h"
 
 unsigned int dN = 1, fN = 1, aN = 1;
 char* suffix; 
