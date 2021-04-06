@@ -14,9 +14,78 @@
 #include "wf_table.h"
 #include "sync_queue.h"
 #include "tokenize.h"
+#include "wf_repo.h"
 
 void *dir_thread_routine(void *arg){
-
+        // fill in as necessary
+        int mutex_status = 0;
+        while (1) {
+                mutex_status = pthread_mutex_lock(&dir_term_mutex);
+                if (mutex_status != 0) {
+                        perror("ERROR!!!");
+                        exit(EXIT_FAILURE);
+                }
+                while (sync_q_empty(directory_queue)) {
+                        no_waiting_dirs += 1;
+                        if (no_waiting_dirs == no_dir_threads) {
+                                mutex_status = pthread_mutex_lock(&file_term_mutex);
+                                if (mutex_status != 0) {
+                                        perror("ERROR!!!");
+                                        exit(EXIT_FAILURE);
+                                }
+                                dir_threads_terminate = 1;
+                                mutex_status = pthread_cond_broadcast(&cond_file);
+                                if (mutex_status != 0) {
+                                        perror("ERROR!!!");
+                                        exit(EXIT_FAILURE);
+                                }
+                                mutex_status = pthread_mutex_unlock(&file_term_mutex);
+                                if (mutex_status != 0) {
+                                        perror("ERROR!!!");
+                                        exit(EXIT_FAILURE);
+                                }
+                                mutex_status = pthread_cond_broadcast(&cond_dir);
+                                if (mutex_status != 0) {
+                                        perror("ERROR!!!");
+                                        exit(EXIT_FAILURE);
+                                }
+                                mutex_status = pthread_mutex_unlock(&dir_term_mutex);
+                                if (mutex_status != 0) {
+                                        perror("ERROR!!!");
+                                        exit(EXIT_FAILURE);
+                                }
+                                return 0;
+                        }
+                        mutex_status = pthread_cond_wait(&cond_dir, &dir_term_mutex);
+                        if (mutex_status != 0) {
+                                perror("ERROR!!!");
+                                exit(EXIT_FAILURE);
+                        }
+                        if (dir_threads_terminate) {
+                                mutex_status = pthread_mutex_unlock(&dir_term_mutex);
+                                if (mutex_status != 0) {
+                                        perror("ERROR!!!");
+                                        exit(EXIT_FAILURE);
+                                }
+                                return 0;
+                        }
+                        no_waiting_dirs -= 1;
+                }
+                mutex_status = pthread_mutex_unlock(&dir_term_mutex);
+                if (mutex_status != 0) {
+                        perror("ERROR!!!");
+                        exit(EXIT_FAILURE);
+                }
+                queue_node *dir = sync_q_remove(directory_queue);
+                if (!dir) {
+                        continue;
+                }
+                /*
+                 * fill in as necessary
+                 * must track if anything was added to the directory queue
+                 * must track if anything was added to the file queue
+                 */
+        }
 }
 
 void *file_thread_routine(void *arg){

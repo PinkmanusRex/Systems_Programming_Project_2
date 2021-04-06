@@ -17,6 +17,9 @@ typedef struct wf_repo{
  */
 wf_repo* wf_repo_create(); 
 
+/** for the purpose of clearing the stack at the end of analysis */
+int wf_repo_clear(wf_repo *);
+
 /**
  * RETURN: EXIT_SUCCESS when deleting empty wf_repo, 
  * EXIT_FAILURE if non-empty stack passed (will not delete if not empty)
