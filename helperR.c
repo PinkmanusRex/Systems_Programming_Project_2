@@ -24,7 +24,7 @@ int main(int argc, char** argv){
     Parameter fileSuffix such as ".txt" need for comparison of directory entries that are files.
     Return: we populate files and dirs by having a pointer to them, nothing returned.
 */
-void directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileSuffix){
+int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileSuffix){
     DIR* dirp = opendir(dequeuedItem);
     // Check if we have perms to read it.
     if(dirp == NULL){
@@ -99,7 +99,7 @@ void directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* file
     }
     closedir(dirp);
     free(dequeuedItem);
-    return;
+    return EXIT_SUCCESS;
 }
 
 // 1 if true, 0 if false

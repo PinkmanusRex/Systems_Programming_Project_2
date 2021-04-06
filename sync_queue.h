@@ -1,6 +1,8 @@
 #ifndef SYNC_QUEUE_H
 #define SYNC_QUEUE_H
+
 #include <pthread.h>
+
 typedef struct queue_node {
         char *name;
         struct queue_node *next;

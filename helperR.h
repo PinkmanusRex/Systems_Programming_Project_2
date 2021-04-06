@@ -11,7 +11,7 @@ struct node{
     Parameter fileSuffix such as ".txt" need for comparison of directory entries that are files.
     Return: we populate files and dirs by having a pointer to them, nothing returned.
 */
-void directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileSuffix);
+int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileSuffix);
 
 /*  Generate file path relative to current working directory for deqeued item 
     Implicitly reentrant
