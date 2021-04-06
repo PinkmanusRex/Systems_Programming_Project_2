@@ -3,7 +3,7 @@
 #include "stringbuf.h"
 #include <ctype.h>
 
-stringbuf *sb_init(int length){
+stringbuf *sb_create(int length){
         if (length < 10) {
                 length = 10;
         }

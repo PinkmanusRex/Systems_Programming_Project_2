@@ -6,7 +6,7 @@ typedef struct stringbuf {
         char *data;
 } stringbuf;
 
-stringbuf *sb_init(int);
+stringbuf *sb_create(int);
 void sb_destroy(stringbuf *);
 int sb_append(stringbuf *, char);
 char *sb_get_lower_word(stringbuf *);

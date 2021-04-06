@@ -170,7 +170,7 @@ int hash_destroy(wf_table *table) {
         return EXIT_SUCCESS;
 }
 
-wf_table *hash_init_table(char *file_name, double y, int no_rows) {
+wf_table *hash_create_table(char *file_name, int no_rows, double y) {
         wf_table *table = malloc(sizeof(wf_table));
         if (!table) {
                 return 0;

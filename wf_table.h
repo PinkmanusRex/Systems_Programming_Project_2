@@ -48,18 +48,13 @@ int hash_rehash(wf_table *);
 int hash_destroy(wf_table *);
 
 /**
- * create a hashtable, initializing all fields to 0 except for filename, with some length no_rows and some double y
- */
-wf_table *hash_create(char*, int, double);
-
-/**
  * actually computes the frequencies for words, which can only be done once we are finished adding words in
  */
 int hash_comp_freq(wf_table *);
 
 /** creates the hashtable with a filename, a y value, and a number of starting rows */
 /** RETURN: either a hashtable or NULL on the condition of malloc failure */
-wf_table *hash_init_table(char *, double, int);
+wf_table *hash_create_table(char *, int, double);
 
 /** look for the word in the hashtable. return frequency of word. returns 0 if not found */
 double hash_get(wf_table *, char *);
