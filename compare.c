@@ -97,12 +97,15 @@ int main(int argc, char** argv){
     strcpy(suffix, ".txt");
 
     if(initializeOptions(argc, argv) == EXIT_FAILURE){
-        perror("Invalid -option arguments");
+        free(suffix);
+        perror("Invalid -option arguments, program halt & terminated");
         return EXIT_FAILURE;
     }
 
     printf("dN = %u \n", dN);
     printf("fN = %u \n", fN);
     printf("aN = %u \n", aN);
-    printf("suffix = %s \n", suffix);
+    printf("suffix = %s + %ld\n", suffix, strlen(suffix));
+    free(suffix);
+    return EXIT_SUCCESS;
 }
