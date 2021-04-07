@@ -30,12 +30,12 @@ char* suffix;
 unsigned int getDigits(char* toConvert){
     for(int i=2; i<strlen(toConvert); i++){
         if(!isdigit(toConvert[i])){
-            return -1;
+            return 0;
         }
     }
     
     unsigned int result = atoi(&toConvert[2]);
-    return result > 0 ? result : 0;
+    return result;
 }
 
 /* Not thread_safe */
