@@ -200,7 +200,6 @@ void *dir_thread_routine(void *arg){
                 }
 
                 /** the directory which was dequeued is no longer of use, so free it */
-                free(dir->name);
                 free(dir);
         }
 }
@@ -311,6 +310,8 @@ void *file_thread_routine(void *arg){
                         perror("ERROR!!!");
                         exit(EXIT_FAILURE);
                 }
+
+                free(file);
 
                 wf_repo_push(wf_stack, table);
         }
