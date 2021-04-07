@@ -9,7 +9,6 @@
 #include "extern_module.h"
 #include "helperR.h"
 #include "stringbuf.h"
-#include "strbuf.h"
 #include "wf_repo.h"
 #include "wf_table.h"
 #include "sync_queue.h"

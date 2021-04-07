@@ -14,7 +14,6 @@
 #include "stringbuf.h"
 #include "wf_table.h"
 #include "helperR.h"
-#include "strbuf.h"
 #include "collection_threads.h"
 #include "debugger.h"
 #include "sync_queue.h"
@@ -26,7 +25,7 @@ char* suffix;
 
 
 
-/* Returns -1 upon invalid */
+/* Returns 0 upon invalid */
 unsigned int getDigits(char* toConvert){
     for(int i=2; i<strlen(toConvert); i++){
         if(!isdigit(toConvert[i])){
@@ -107,6 +106,7 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
+    /** wrap these print statements inside an if(DEBUG) block */
     printf("dN = %u \n", dN);
     printf("fN = %u \n", fN);
     printf("aN = %u \n", aN);

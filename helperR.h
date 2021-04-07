@@ -1,3 +1,6 @@
+#ifndef HELPERR_H
+#define HELPERR_H
+#include <stdlib.h>
 /* Used for generateFilePath */
 typedef struct {
     size_t length;
@@ -39,5 +42,4 @@ char* generateFilePath(char* directoryName, char* currPath);
     If fileName doesn't end with fileSuffix, returns 0
 */
 int endsWithSuffix(char* fileSuffix, char* fileName);
-
-
+#endif
