@@ -112,5 +112,35 @@ int main(int argc, char** argv){
     printf("aN = %u \n", aN);
     printf("suffix = %s + %ld\n", suffix, strlen(suffix));
     free(suffix);
+    /**
+     * TODO:
+     *  initialize the queues and the relevant extern variables
+     *  fill the queues with the preliminary directories and files as taken from the command-line
+     */
+
+    /**
+     * TODO:
+     *  declare and initialize array of directory thread and file thread ids for later joining
+     *  actually start the directory and file threads
+     *  join the directory threads and then the file threads
+     *  cleanup the queues and all the shared resources that are not relevant or needed for the analysis phase
+     */
+
+    /** the debug print of the contents of the wf_repo */
+    if (DEBUG) {
+            debug_wf_repo_print(wf_stack);
+    }
+
+    /**
+     * TODO:
+     *  analysis phase, where the number of analysis threads should not exceed the number of comparisons (1/2)(n)(n-1)
+     *  once analysis threads all finish, the final array of jsd results must be quicksorted utilizing the provided jsd_comparator
+     */
+
+    /**
+     * TODO:
+     *  cleanup the repo
+     */
+
     return EXIT_SUCCESS;
 }

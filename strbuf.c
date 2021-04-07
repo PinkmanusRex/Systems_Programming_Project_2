@@ -2,10 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "strbuf.h"
-
-#ifndef DEBUG
-#define DEBUG 0
-#endif
+#include "debugger.h"
 
 int sb_resetk(strbuf_t *sb){
     sb->used = 0;

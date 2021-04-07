@@ -14,7 +14,6 @@
 #include "wf_table.h"
 #include "sync_queue.h"
 #include "tokenize.h"
-#include "wf_repo.h"
 
 void *dir_thread_routine(void *arg){
         int mutex_status = 0;
