@@ -30,12 +30,12 @@ char* suffix;
 unsigned int getDigits(char* toConvert){
     for(int i=2; i<strlen(toConvert); i++){
         if(!isdigit(toConvert[i])){
-            return -1;
+            return 0;
         }
     }
     
     unsigned int result = atoi(&toConvert[2]);
-    return result > 0 ? result : -1;
+    return result;
 }
 
 /* Not thread_safe */
@@ -55,21 +55,21 @@ int initializeOptions(int numArgs, char** Args){
             if(optionFlag == 'd'){
                 if(lengthOfCurrent == 2){return EXIT_FAILURE;}
                 dN = getDigits(current);
-                if(dN == -1){
+                if(dN == 0){
                     return EXIT_FAILURE;
                 }
             }
             else if(optionFlag == 'f'){
                 if(lengthOfCurrent == 2){return EXIT_FAILURE;}
                 fN = getDigits(current);
-                if(fN == -1){
+                if(fN == 0){
                     return EXIT_FAILURE;
                 }
             }
             else if(optionFlag == 'a'){
                 if(lengthOfCurrent == 2){return EXIT_FAILURE;}
                 aN = getDigits(current);
-                if(aN == -1){
+                if(aN == 0){
                     return EXIT_FAILURE;
                 }
 
