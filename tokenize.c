@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
@@ -6,12 +7,16 @@
 #include "wf_table.h"
 #include "stringbuf.h"
 #include "tokenize.h"
+#include "debugger.h"
 
 int tokenize(int fd, wf_table *table, stringbuf *list) {
+        fprintf(stdout, "The wf_table: %s, and it's row count is %d\n", table->file_name, table->no_rows);
         enum word_states word_state = wEmpty;
         int bytesRead = 0;
-        char inter_buf[500];
-        while ((bytesRead=read(fd, inter_buf, 500) > 0)) {
+        char inter_buf[50];
+        bytesRead = read(fd, inter_buf, 50);
+        while ((bytesRead > 0)) {
+                fprintf(stdout, "Bytes read: %d\n", bytesRead);
                 int buf_read = 0;
                 while (buf_read < bytesRead) {
                         if (word_state == wEmpty) { 
@@ -35,6 +40,9 @@ int tokenize(int fd, wf_table *table, stringbuf *list) {
                         }
                         if (word_state==wComplete) {
                                 char *word = sb_get_lower_word(list);
+                                if (DEBUG) {
+                                        fprintf(stdout, "%s\n", word);
+                                }
                                 /** if word is null, that means malloc failed */
                                 if (!word) {
                                         return EXIT_FAILURE;
@@ -47,9 +55,13 @@ int tokenize(int fd, wf_table *table, stringbuf *list) {
                         }
                         buf_read += 1;
                 }
+                bytesRead = read(fd, inter_buf, 50);
         }
         if (word_state==wIncomplete) {
                 char *word = sb_get_lower_word(list);
+                if (DEBUG) {
+                        fprintf(stdout, "%s\n", word);
+                }
                 if (!word) {
                         return EXIT_FAILURE;
                 }
@@ -63,5 +75,8 @@ int tokenize(int fd, wf_table *table, stringbuf *list) {
         }
         hash_comp_freq(table);
         free(table->data);
+        for (int i = 0; i < table->no_entries; i += 1) {
+                fprintf(stdout, "entry[%d] = %s\n", i, table->list[i]->word);
+        }
         return EXIT_SUCCESS;
 }

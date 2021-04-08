@@ -23,7 +23,24 @@
 unsigned int dN = 1, fN = 1, aN = 1;
 char* suffix; 
 
-
+char *file_suffix;
+pthread_mutex_t dir_term_mutex;
+pthread_mutex_t file_term_mutex;
+unsigned int no_waiting_dirs;
+unsigned int no_waiting_files;
+unsigned int no_dir_threads;
+unsigned int no_file_threads;
+pthread_cond_t cond_dir;
+pthread_cond_t cond_file;
+unsigned int dir_threads_terminate;
+sync_queue *directory_queue;
+sync_queue *file_queue;
+wf_repo *wf_stack;
+wf_table *x;
+wf_table *y;
+unsigned int jsd_comp_iter;
+unsigned int jsd_total_comp;
+jsd_entry **jsd_list;
 
 /* Returns 0 upon invalid */
 unsigned int getDigits(char* toConvert){
@@ -101,17 +118,17 @@ int main(int argc, char** argv){
     strcpy(suffix, ".txt");
 
     if(initializeOptions(argc, argv) == EXIT_FAILURE){
+        fprintf(stdout, "Invalid -option arguments, program halt & terminated");
         free(suffix);
-        perror("Invalid -option arguments, program halt & terminated");
         exit(EXIT_FAILURE);
     }
 
     /** wrap these print statements inside an if(DEBUG) block */
-    printf("dN = %u \n", dN);
-    printf("fN = %u \n", fN);
-    printf("aN = %u \n", aN);
-    printf("suffix = %s + %ld\n", suffix, strlen(suffix));
-    free(suffix);
+    //printf("dN = %u \n", dN);
+    //printf("fN = %u \n", fN);
+    //printf("aN = %u \n", aN);
+    //printf("suffix = %s + %ld\n", suffix, strlen(suffix));
+    //free(suffix);
     /**
      * TODO:
      *  initialize the queues and the relevant extern variables
@@ -121,9 +138,10 @@ int main(int argc, char** argv){
     // Initialize and populate the synchronized queues
     directory_queue = sync_q_create();
     file_queue = sync_q_create();
+    wf_stack = wf_repo_create();
 
-    if(directory_queue == NULL || file_queue == NULL){
-        perror("Failure to initialize a syncronized queue (file and/or directory)");
+    if(directory_queue == NULL || file_queue == NULL || wf_stack == NULL){
+        perror("Failure to initialize a syncronized queue (file and/or directory and/or wf repo)");
         exit(EXIT_FAILURE);
     }
 
@@ -205,7 +223,6 @@ int main(int argc, char** argv){
     no_file_threads = fN;
 
     dir_threads_terminate = 0;
-    file_threads_terminate = 0;
     
     // Initialize relevant extern mutexes and conditional vars
     if(pthread_mutex_init(&dir_term_mutex, NULL) != 0)
@@ -319,9 +336,9 @@ int main(int argc, char** argv){
     }
 
     /** the debug print of the contents of the wf_repo */
-    if (DEBUG) {
+    //if (DEBUG) {
             debug_wf_repo_print(wf_stack);
-    }
+    //}
 
     /**
      * TODO:

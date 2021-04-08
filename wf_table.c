@@ -1,7 +1,9 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "wf_table.h"
+#include "debugger.h"
 
 unsigned long hash_func(char *word){
         /** credit to djb2 algorithm by dan bernstein */
@@ -17,8 +19,9 @@ unsigned long hash_func(char *word){
 
 int hash_insert(wf_table *table, char *word) {
         unsigned long hash = hash_func(word);
-        int idx = (int)(hash % table->no_rows);
-        wf_item *row = (table->data)[idx];
+        int idx = (int)((hash) % table->no_rows);
+        fprintf(stdout, "index: %d\n", idx);
+        wf_item *row = table->data[idx];
         /** if the row is empty, then just put it as the head */
         if (!row) {
                 wf_item *entry = malloc(sizeof(wf_item));
@@ -30,14 +33,16 @@ int hash_insert(wf_table *table, char *word) {
                 entry->freq = -1;
                 entry->hashcode = hash;
                 entry->next = 0;
-                row = entry;
+                table->data[idx] = entry;
                 table->no_words += 1;
                 table->no_entries += 1;
+                fprintf(stdout, "word: %s\n", entry->word);
         } else {
                 wf_item *ptr = row;
                 wf_item *prev = 0;
                 while (ptr) {
                         if (strcmp(ptr->word, word)==0) {
+                                fprintf(stdout, "word: %s\n", ptr->word);
                                 ptr->count += 1;
                                 /** word was found in the table, but we do not need to store the duplicate word in the heap */
                                 free(word);
@@ -59,6 +64,7 @@ int hash_insert(wf_table *table, char *word) {
                         entry->next = 0;
                         prev->next = entry;
                         table->no_entries += 1;
+                        fprintf(stdout, "word: %s\n", entry->word);
                 }
                 table->no_words += 1;
         }
@@ -176,6 +182,7 @@ wf_table *hash_create_table(char *file_name, int no_rows, double y) {
                 return 0;
         }
         table->list = 0;
+        table->no_rows = no_rows;
         table->file_name = file_name;
         table->no_words = 0;
         table->no_entries = 0;
@@ -226,9 +233,19 @@ int hash_lexical_list(wf_table *table) {
                         wf_item *ptr = row;
                         while (ptr) {
                                 table->list[j] = ptr;
+                                //table->list[j] = malloc(sizeof(wf_table));
+                                //table->list[j]->word = ptr->word;
+                                //fprintf(stdout, "%s\n", table->list[j]->word);
                                 j += 1;
                                 ptr = ptr->next;
                         }
+                }
+        }
+        if (DEBUG) {
+                for (int i = 0 ; i < table->no_entries; i += 1) {
+                        wf_item *entry = table->list[i];
+                        fprintf(stdout, "size in bytes of pointer: %zu\n", sizeof(entry));
+                        fprintf(stdout, "word is: %s\n", entry->word);
                 }
         }
         qsort((void *)(table->list), table->no_entries, sizeof(wf_item *), wf_item_comparator);
@@ -236,7 +253,11 @@ int hash_lexical_list(wf_table *table) {
 }
 
 int wf_item_comparator(const void *wf_1_void, const void *wf_2_void) {
-        wf_item *wf_1 = (wf_item *) wf_1_void;
-        wf_item *wf_2 = (wf_item *) wf_2_void;
+        wf_item *wf_1 = *(wf_item **) wf_1_void;
+        wf_item *wf_2 = *(wf_item **) wf_2_void;
+        if (DEBUG) {
+                fprintf(stdout, "word 1: %s\n", wf_1->word);
+                fprintf(stdout, "word 2: %s\n", wf_2->word);
+        }
         return strcmp(wf_1->word, wf_2->word);
 }

@@ -26,7 +26,6 @@ extern pthread_cond_t cond_file;
 
 /** flags that will let the threads determine whether to terminate or not */
 extern unsigned int dir_threads_terminate;
-extern unsigned int file_threads_terminate;
 
 /** the directory and file queues that should be shared with all directory and file threads */
 extern sync_queue *directory_queue;

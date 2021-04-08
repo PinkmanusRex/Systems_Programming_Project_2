@@ -224,6 +224,7 @@ void *file_thread_routine(void *arg){
                                         perror("ERROR!!!");
                                         exit(EXIT_FAILURE);
                                 }
+                                sb_destroy(list);
                                 return 0;
                         }
                         /** if the above is not seen, then the file thread cannot know if it must truly be terminated just yet, therefore
@@ -245,6 +246,7 @@ void *file_thread_routine(void *arg){
                                         perror("ERROR!!!");
                                         exit(EXIT_FAILURE);
                                 }
+                                sb_destroy(list);
                                 return 0;
                         }
                 }
