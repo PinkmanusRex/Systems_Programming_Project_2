@@ -20,7 +20,9 @@ unsigned long hash_func(char *word){
 int hash_insert(wf_table *table, char *word) {
         unsigned long hash = hash_func(word);
         int idx = (int)((hash) % table->no_rows);
-        fprintf(stdout, "index: %d\n", idx);
+        if (DEBUG) {
+            fprintf(stdout, "inserting at index: %d\n", idx);
+        }
         wf_item *row = table->data[idx];
         /** if the row is empty, then just put it as the head */
         if (!row) {
@@ -36,13 +38,17 @@ int hash_insert(wf_table *table, char *word) {
                 table->data[idx] = entry;
                 table->no_words += 1;
                 table->no_entries += 1;
-                fprintf(stdout, "word: %s\n", entry->word);
+                if (DEBUG) {
+                    fprintf(stdout, "word: %s\n", entry->word);
+                }
         } else {
                 wf_item *ptr = row;
                 wf_item *prev = 0;
                 while (ptr) {
                         if (strcmp(ptr->word, word)==0) {
-                                fprintf(stdout, "word: %s\n", ptr->word);
+                                if (DEBUG) {
+                                    fprintf(stdout, "word: %s\n", ptr->word);
+                                }
                                 ptr->count += 1;
                                 /** word was found in the table, but we do not need to store the duplicate word in the heap */
                                 free(word);
@@ -64,7 +70,9 @@ int hash_insert(wf_table *table, char *word) {
                         entry->next = 0;
                         prev->next = entry;
                         table->no_entries += 1;
-                        fprintf(stdout, "word: %s\n", entry->word);
+                        if (DEBUG) {
+                            fprintf(stdout, "word: %s\n", entry->word);
+                        }
                 }
                 table->no_words += 1;
         }
@@ -233,9 +241,6 @@ int hash_lexical_list(wf_table *table) {
                         wf_item *ptr = row;
                         while (ptr) {
                                 table->list[j] = ptr;
-                                //table->list[j] = malloc(sizeof(wf_table));
-                                //table->list[j]->word = ptr->word;
-                                //fprintf(stdout, "%s\n", table->list[j]->word);
                                 j += 1;
                                 ptr = ptr->next;
                         }

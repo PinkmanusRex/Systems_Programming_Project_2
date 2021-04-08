@@ -61,6 +61,5 @@ char *sb_get_lower_word(stringbuf *list){
         lower_word[list->used] = '\0';
         list->used = 0;
         list->data[0] = '\0';
-        fprintf(stdout, "sb_get_lower_word: %s\n", lower_word);
         return lower_word;
 }

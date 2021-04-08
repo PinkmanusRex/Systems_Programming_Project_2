@@ -4,7 +4,7 @@ CFLAGS = -g -std=c99 -Wvla -Wall -pthread -fsanitize=address,undefined
 all: compare
 
 compare: compare.o collection_threads.o debugger.o helperR.o jsd.o stringbuf.o sync_queue.o tokenize.o wf_repo.o wf_table.o
-	$(CC) $(CFLAGS) -D DEBUG -o $@ $^
+	$(CC) $(CFLAGS) -DDEBUG -o $@ $^
 
 compare.o: compare.c jsd.h tokenize.h stringbuf.h wf_table.h helperR.h collection_threads.h debugger.h sync_queue.h extern_module.h wf_repo.h
 	$(CC) $(CFLAGS) -c $<
@@ -37,8 +37,9 @@ wf_table.o: wf_table.c wf_table.h debugger.h
 	$(CC) $(CFLAGS) -c $<
 
 tester: tester.o debugger.o stringbuf.o tokenize.o wf_repo.o wf_table.o
-	$(CC) $(CFLAGS) -D DEBUG -o $@ $^
+	$(CC) $(CFLAGS) -DDEBUG -o $@ $^
 
 clean:
 	rm *.o
 	rm compare
+	rm tester

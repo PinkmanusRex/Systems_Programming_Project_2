@@ -39,6 +39,10 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
 
         // Relative path fully formed.
         char* currentPath = generateFilePath(dequeuedItem, entry->d_name);
+
+#ifdef DEBUG
+        fprintf(stdout, "currentPath: %s\n", currentPath);
+#endif
         
         statReturn = stat(currentPath, &entryStat); // Variety of reasons -> man 2 stat
         if(statReturn == -1) {

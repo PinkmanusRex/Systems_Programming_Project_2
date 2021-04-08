@@ -23,6 +23,9 @@ void *dir_thread_routine(void *arg){
                         perror("ERROR!!!");
                         exit(EXIT_FAILURE);
                 }
+//#ifdef DEBUG
+                fprintf(stdout, "no. items in directory queue: %d\n", directory_queue->entries);
+//#endif
                 while (sync_q_empty(directory_queue)) {
                         no_waiting_dirs += 1;
                         /** once the last directory thread is waiting, there can be no more directories that will be added
@@ -110,6 +113,9 @@ void *dir_thread_routine(void *arg){
                 files->next = 0;
                 dirs->value = 0;
                 dirs->next = 0;
+#ifdef DEBUG
+                fprintf(stdout, "dir->name: %s\nfile_suffix: %s\n", dir->name, file_suffix);
+#endif
                 directoryFunction_r(dir->name, files, dirs, file_suffix);
 
                 /** flags to track if anything added to their respective queues */
@@ -213,6 +219,9 @@ void *file_thread_routine(void *arg){
                         perror("ERROR!!!");
                         exit(EXIT_FAILURE);
                 }
+//#ifdef DEBUG
+                fprintf(stdout, "no entries in file queue: %d\n", file_queue->entries);
+//#endif
                 /** check similarly to the directory_thread_routine, where an empty file queue is not necessarily the end of all work */
                 while (sync_q_empty(file_queue)) {
                         /** suppose that the directory threads set termination before a file thread sees the file queue as empty
@@ -240,7 +249,7 @@ void *file_thread_routine(void *arg){
                          * a) because the directory threads added to the file queue or, as in this case
                          * b) the last directory thread has sent a termination signal
                          */
-                        if (dir_threads_terminate) {
+                        if (dir_threads_terminate && sync_q_empty(file_queue)) {
                                 mutex_status = pthread_mutex_unlock(&file_term_mutex);
                                 if (mutex_status != 0) {
                                         perror("ERROR!!!");

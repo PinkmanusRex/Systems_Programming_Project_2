@@ -23,7 +23,7 @@
 unsigned int dN = 1, fN = 1, aN = 1;
 char* suffix; 
 
-char *file_suffix;
+char *file_suffix = ".txt";
 pthread_mutex_t dir_term_mutex;
 pthread_mutex_t file_term_mutex;
 unsigned int no_waiting_dirs;
@@ -298,6 +298,7 @@ int main(int argc, char** argv){
     // Now that they are done doing their work, we can free memory allocated for their jobs.
     // But first ensure they are empty.
     if(!(sync_q_empty(file_queue) && sync_q_empty(directory_queue))){
+        fprintf(stdout, "No items in file queue: %d, No items in directory queue: %d\n", file_queue->entries, directory_queue->entries);
         perror("Something went wrong in routines.");
         free(suffix);
         exit(EXIT_FAILURE);
@@ -339,9 +340,9 @@ int main(int argc, char** argv){
     free(directoryTID);
 
     /** the debug print of the contents of the wf_repo */
-    //if (DEBUG) {
-            debug_wf_repo_print(wf_stack);
-    //}
+#ifdef DEBUG
+     debug_wf_repo_print(wf_stack);
+#endif
 
     /**
      * TODO:

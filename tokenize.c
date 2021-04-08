@@ -10,13 +10,14 @@
 #include "debugger.h"
 
 int tokenize(int fd, wf_table *table, stringbuf *list) {
-        fprintf(stdout, "The wf_table: %s, and it's row count is %d\n", table->file_name, table->no_rows);
+        if (DEBUG) {
+            fprintf(stdout, "The wf_table: %s, and it's row count is %d\n", table->file_name, table->no_rows);
+        }
         enum word_states word_state = wEmpty;
         int bytesRead = 0;
         char inter_buf[50];
         bytesRead = read(fd, inter_buf, 50);
         while ((bytesRead > 0)) {
-                fprintf(stdout, "Bytes read: %d\n", bytesRead);
                 int buf_read = 0;
                 while (buf_read < bytesRead) {
                         if (word_state == wEmpty) { 
@@ -75,8 +76,10 @@ int tokenize(int fd, wf_table *table, stringbuf *list) {
         }
         hash_comp_freq(table);
         free(table->data);
-        for (int i = 0; i < table->no_entries; i += 1) {
+        if (DEBUG) {
+            for (int i = 0; i < table->no_entries; i += 1) {
                 fprintf(stdout, "entry[%d] = %s\n", i, table->list[i]->word);
+            }
         }
         return EXIT_SUCCESS;
 }
