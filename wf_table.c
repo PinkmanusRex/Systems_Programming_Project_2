@@ -132,7 +132,7 @@ int hash_comp_freq(wf_table *table) {
 int hash_comp_freq(wf_table *table) {
         for (int i = 0; i < table->no_entries; i += 1) {
                 wf_item *entry = table->list[i];
-                entry->freq = (double)entry->count/table->no_words;
+                entry->freq = (double)entry->count/(double)table->no_words;
         }
         return EXIT_SUCCESS;
 }

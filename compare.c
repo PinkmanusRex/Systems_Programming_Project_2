@@ -335,6 +335,9 @@ int main(int argc, char** argv){
         exit(EXIT_FAILURE);
     }
 
+    free(filesTID);
+    free(directoryTID);
+
     /** the debug print of the contents of the wf_repo */
     //if (DEBUG) {
             debug_wf_repo_print(wf_stack);
