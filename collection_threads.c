@@ -13,6 +13,7 @@
 #include "wf_table.h"
 #include "sync_queue.h"
 #include "tokenize.h"
+#include "debugger.h"
 
 void *dir_thread_routine(void *arg){
         int mutex_status = 0;
@@ -23,9 +24,9 @@ void *dir_thread_routine(void *arg){
                         perror("ERROR!!!");
                         exit(EXIT_FAILURE);
                 }
-//#ifdef DEBUG
-                fprintf(stdout, "no. items in directory queue: %d\n", directory_queue->entries);
-//#endif
+#ifdef DEBUG
+                fprintf(stdout, "collection_threads.c:dir_thread_routine:\n\tno. items in directory queue: %d\n", directory_queue->entries);
+#endif
                 while (sync_q_empty(directory_queue)) {
                         no_waiting_dirs += 1;
                         /** once the last directory thread is waiting, there can be no more directories that will be added
@@ -114,7 +115,7 @@ void *dir_thread_routine(void *arg){
                 dirs->value = 0;
                 dirs->next = 0;
 #ifdef DEBUG
-                fprintf(stdout, "dir->name: %s\nfile_suffix: %s\n", dir->name, file_suffix);
+                fprintf(stdout, "\tdir->name: %s, file_suffix: %s\n", dir->name, file_suffix);
 #endif
                 directoryFunction_r(dir->name, files, dirs, file_suffix);
 
@@ -219,9 +220,9 @@ void *file_thread_routine(void *arg){
                         perror("ERROR!!!");
                         exit(EXIT_FAILURE);
                 }
-//#ifdef DEBUG
-                fprintf(stdout, "no entries in file queue: %d\n", file_queue->entries);
-//#endif
+#ifdef DEBUG
+                fprintf(stdout, "collection_threads.c:file_thread_routine:\n\tno entries in file queue: %d\n", file_queue->entries);
+#endif
                 /** check similarly to the directory_thread_routine, where an empty file queue is not necessarily the end of all work */
                 while (sync_q_empty(file_queue)) {
                         /** suppose that the directory threads set termination before a file thread sees the file queue as empty
