@@ -25,7 +25,7 @@ char* suffix;
 
 
 
-/* Returns -1 upon invalid */
+/* Returns 0 upon invalid */
 unsigned int getDigits(char* toConvert){
     for(int i=2; i<strlen(toConvert); i++){
         if(!isdigit(toConvert[i])){
@@ -106,11 +106,12 @@ int main(int argc, char** argv){
         exit(EXIT_FAILURE);
     }
 
-    //printf("dN = %u \n", dN);
-    //printf("fN = %u \n", fN);
-    //printf("aN = %u \n", aN);
-    //printf("suffix = %s + %ld\n", suffix, strlen(suffix));
-
+    /** wrap these print statements inside an if(DEBUG) block */
+    printf("dN = %u \n", dN);
+    printf("fN = %u \n", fN);
+    printf("aN = %u \n", aN);
+    printf("suffix = %s + %ld\n", suffix, strlen(suffix));
+    free(suffix);
     /**
      * TODO:
      *  initialize the queues and the relevant extern variables
