@@ -16,6 +16,9 @@
 #include "debugger.h"
 
 void *dir_thread_routine(void *arg){
+#ifdef DEBUG
+        fprintf(stdout, "dir_thread_routine %lu started\n", pthread_self());
+#endif
         int mutex_status = 0;
         while (1) {
                 /** check if there is anything in the directory queue */
@@ -25,7 +28,7 @@ void *dir_thread_routine(void *arg){
                         exit(EXIT_FAILURE);
                 }
 #ifdef DEBUG
-                fprintf(stdout, "collection_threads.c:dir_thread_routine:\n\tno. items in directory queue: %d\n", directory_queue->entries);
+                fprintf(stdout, "dir_thread_routine %lu :\n\tno. items in directory queue: %d\n", pthread_self(), directory_queue->entries);
 #endif
                 while (sync_q_empty(directory_queue)) {
                         no_waiting_dirs += 1;
@@ -115,7 +118,7 @@ void *dir_thread_routine(void *arg){
                 dirs->value = 0;
                 dirs->next = 0;
 #ifdef DEBUG
-                fprintf(stdout, "\tdir->name: %s, file_suffix: %s\n", dir->name, file_suffix);
+                fprintf(stdout, "\t%lu: dir->name: %s, file_suffix: %s\n", pthread_self(), dir->name, file_suffix);
 #endif
                 directoryFunction_r(dir->name, files, dirs, file_suffix);
 
@@ -214,6 +217,13 @@ void *file_thread_routine(void *arg){
         int mutex_status = 0;
         /** initialize the stringbuf here to save the amount of memory allocations needed */
         stringbuf *list = sb_create(10);
+        if (!list) {
+                fprintf(stderr, "MALLOC FAILURE!!!");
+                exit(EXIT_FAILURE);
+        }
+#ifdef DEBUG
+        fprintf(stdout, "file_thread_routine %lu started\n", pthread_self());
+#endif
         while (1) {
                 mutex_status = pthread_mutex_lock(&file_term_mutex);
                 if (mutex_status != 0) {
@@ -221,7 +231,7 @@ void *file_thread_routine(void *arg){
                         exit(EXIT_FAILURE);
                 }
 #ifdef DEBUG
-                fprintf(stdout, "collection_threads.c:file_thread_routine:\n\tno entries in file queue: %d\n", file_queue->entries);
+                fprintf(stdout, "file_thread_routine %lu:\n\tno entries in file queue: %d\n", pthread_self(), file_queue->entries);
 #endif
                 /** check similarly to the directory_thread_routine, where an empty file queue is not necessarily the end of all work */
                 while (sync_q_empty(file_queue)) {
