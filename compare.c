@@ -23,7 +23,7 @@
 unsigned int dN = 1, fN = 1, aN = 1;
 char* suffix; 
 
-char *file_suffix = ".txt";
+char *file_suffix;
 pthread_mutex_t dir_term_mutex;
 pthread_mutex_t file_term_mutex;
 unsigned int no_waiting_dirs;
@@ -258,6 +258,8 @@ int main(int argc, char** argv){
         perror("malloc failed to initialize array of file pthreads");
         exit(EXIT_FAILURE);
     }
+
+    file_suffix = suffix;
     
     /* Create directory and file threads, and pass in their routines */
     int create;
