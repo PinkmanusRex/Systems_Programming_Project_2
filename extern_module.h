@@ -40,4 +40,7 @@ extern wf_table *y;
 extern unsigned int jsd_comp_iter;
 extern unsigned int jsd_total_comp;
 extern jsd_entry **jsd_list;
+
+/** mutexes for the analysis phase */
+extern pthread_mutex_t analysis_mutex;
 #endif

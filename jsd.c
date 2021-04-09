@@ -44,7 +44,7 @@ int jsd_destroy_list(jsd_entry **list, int len) {
 }
 
 int jsd_comparator(const void *entry_1, const void *entry_2) {
-        jsd_entry *jsd_entry_1 = (jsd_entry *)entry_1;
-        jsd_entry *jsd_entry_2 = (jsd_entry *)entry_2;
+        jsd_entry *jsd_entry_1 = *(jsd_entry **)entry_1;
+        jsd_entry *jsd_entry_2 = *(jsd_entry **)entry_2;
         return jsd_entry_1->total_words - jsd_entry_2->total_words;
 }
