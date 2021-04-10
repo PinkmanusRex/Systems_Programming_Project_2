@@ -43,4 +43,6 @@ extern jsd_entry **jsd_list;
 
 /** mutexes for the analysis phase */
 extern pthread_mutex_t analysis_mutex;
+/** this mutex is just to synchronize the jsd_comp for easier reading of the debug prints */
+extern pthread_mutex_t jsd_sync_mutex;
 #endif

@@ -10,7 +10,7 @@
 void *analysis_thread_routine(void *arg){
         int mutex_status = 0;
 #ifdef DEBUG
-        fprintf(stdout, "Start of analysis thread\n");
+        fprintf(stdout, "Start of analysis thread: %lu\n", pthread_self());
 #endif
         while (1) {
                 mutex_status = pthread_mutex_lock(&analysis_mutex);
@@ -39,13 +39,17 @@ void *analysis_thread_routine(void *arg){
                         y = x->next;
                 }
 #ifdef DEBUG
-                fprintf(stdout, "f1: %s, f2: %s, idx: %d\n", f1->file_name, f2->file_name, cur_idx);
+                fprintf(stdout, "analysis thread %lu working on %s & %s @ idx %d\n", pthread_self(), f1->file_name, f2->file_name, cur_idx);
 #endif
                 mutex_status = pthread_mutex_unlock(&analysis_mutex);
                 if (mutex_status != 0) {
                         perror("ERROR!!!");
                         exit(EXIT_FAILURE);
                 }
+                jsd_list[cur_idx]->file_1 = f1->file_name;
+                jsd_list[cur_idx]->file_2 = f2->file_name;
+                jsd_list[cur_idx]->total_words = f1->no_words + f2->no_words;
+                jsd_list[cur_idx]->jsd = jsd_comp(f1, f2);
         }
         return 0;
 }

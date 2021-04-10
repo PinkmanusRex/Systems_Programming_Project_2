@@ -19,6 +19,7 @@
 #include "sync_queue.h"
 #include "extern_module.h"
 #include "wf_repo.h"
+#include "analysis_threads.h"
 
 unsigned int dN = 1, fN = 1, aN = 1;
 char* suffix; 
@@ -41,6 +42,11 @@ wf_table *y;
 unsigned int jsd_comp_iter;
 unsigned int jsd_total_comp;
 jsd_entry **jsd_list;
+pthread_mutex_t analysis_mutex;
+
+#ifdef DEBUG
+pthread_mutex_t jsd_sync_mutex;
+#endif
 
 /* Returns 0 upon invalid */
 unsigned int getDigits(char* toConvert){
@@ -225,18 +231,37 @@ int main(int argc, char** argv){
     dir_threads_terminate = 0;
     
     // Initialize relevant extern mutexes and conditional vars
-    if(pthread_mutex_init(&dir_term_mutex, NULL) != 0)
-        {perror("mutex init failure"); exit(EXIT_FAILURE);};
+    if(pthread_mutex_init(&dir_term_mutex, NULL) != 0) {
+            perror("mutex init failure"); 
+            exit(EXIT_FAILURE);
+    }
     
-    if(pthread_mutex_init(&file_term_mutex, NULL) != 0)
-        {perror("mutex init failure"); exit(EXIT_FAILURE);};
+    if(pthread_mutex_init(&file_term_mutex, NULL) != 0) {
+            perror("mutex init failure"); 
+            exit(EXIT_FAILURE);
+    }
 
-    if(pthread_cond_init(&cond_dir, NULL) != 0)
-        {perror("cond init failure"); exit(EXIT_FAILURE);};
+    if(pthread_cond_init(&cond_dir, NULL) != 0) {
+            perror("cond init failure"); 
+            exit(EXIT_FAILURE);
+    }
     
-    if(pthread_cond_init(&cond_file, NULL) != 0)
-        {perror("cond init failure"); exit(EXIT_FAILURE);};
+    if(pthread_cond_init(&cond_file, NULL) != 0) {
+            perror("cond init failure"); 
+            exit(EXIT_FAILURE);
+    }
 
+    if (pthread_mutex_init(&analysis_mutex, NULL) != 0) {
+            perror("mutex init failure"); 
+            exit(EXIT_FAILURE);
+    }
+
+#ifdef DEBUG
+    if (pthread_mutex_init(&jsd_sync_mutex, NULL) != 0) {
+            perror("utex init failure");
+            exit(EXIT_FAILURE);
+    }
+#endif
 
     /**
      * TODO:
@@ -351,11 +376,71 @@ int main(int argc, char** argv){
      *  analysis phase, where the number of analysis threads should not exceed the number of comparisons (1/2)(n)(n-1)
      *  once analysis threads all finish, the final array of jsd results must be quicksorted utilizing the provided jsd_comparator
      */
+     int err_flag = 0;
+     if (wf_stack->size >= 2) {
+             x = wf_stack->table;
+             y = x->next;
+             jsd_comp_iter = 0;
+             jsd_total_comp = wf_stack->size * (wf_stack->size - 1) / 2;
+             jsd_list = jsd_create_list(jsd_total_comp);
+             if (!jsd_list) {
+                     fprintf(stderr, "malloc failure: could not allocate space for jsd_list\n");
+                     exit(EXIT_FAILURE);
+             }
+             if (aN > jsd_total_comp) {
+                     aN = jsd_total_comp;
+             }
+             pthread_t *analysisTID = malloc(sizeof(pthread_t) * aN);
+             if (!analysisTID) {
+                     fprintf(stderr, "malloc failure: could not allocate space for analysis thread array\n");
+                     exit(EXIT_FAILURE);
+             }
+             int create = 0;
+             for (int i = 0; i < aN; i += 1) {
+                     create = pthread_create(&analysisTID[i], NULL, analysis_thread_routine, NULL);
+                     if (create != 0) {
+                             perror("error creating analysis thread");
+                             exit(EXIT_FAILURE);
+                     }
+             }
+             int join = 0;
+             for (int i = 0; i < aN; i += 1) {
+                     join = pthread_join(analysisTID[i], NULL);
+                     if (join != 0) {
+                             perror("error joining analysis thread");
+                             exit(EXIT_FAILURE);
+                     }
+             }
+             free(analysisTID);
+             qsort((void *)(jsd_list), jsd_total_comp, sizeof(jsd_entry *), jsd_comparator);
+             jsd_print_list(jsd_list, jsd_total_comp);
+             jsd_destroy_list(jsd_list, jsd_total_comp);
+     }
+     else {
+             err_flag = 1;
+     }
+     mutex_status = pthread_mutex_destroy(&analysis_mutex);
+     if (mutex_status != 0) {
+             perror("mutex destroy error analysis_mutex");
+             exit(EXIT_FAILURE);
+     }
+#ifdef DEBUG
+     mutex_status = pthread_mutex_destroy(&jsd_sync_mutex);
+     if (mutex_status != 0) {
+             perror("mutex destroy error jsd_sync_mutex");
+             exit(EXIT_FAILURE);
+     }
+#endif
 
     /**
      * TODO:
      *  cleanup the repo
      */
+     wf_repo_clear(wf_stack);
+     wf_repo_destroy(wf_stack);
 
-    return EXIT_SUCCESS;
+     if (err_flag) {
+             return EXIT_FAILURE;
+     }
+     return EXIT_SUCCESS;
 }
