@@ -43,7 +43,6 @@ unsigned int jsd_comp_iter;
 unsigned int jsd_total_comp;
 jsd_entry **jsd_list;
 pthread_mutex_t analysis_mutex;
-int err_flag;
 
 #ifdef DEBUG
 pthread_mutex_t jsd_sync_mutex;
@@ -112,7 +111,8 @@ int initializeOptions(int numArgs, char** Args){
 }
 
 int main(int argc, char** argv){
-        err_flag = 0;
+    int retval = 0;
+    int err_flag = 0;
     /* Will not need mutex to check flags */
     /* Options can be given in any order, any # of times
         The last flag overwrites the value.
@@ -314,17 +314,23 @@ int main(int argc, char** argv){
         /* !! Wait for directory threads and file threads to do their job !! */
     int join;
     for(int i=0; i < no_dir_threads; i++){
-        join = pthread_join(directoryTID[i], NULL); // thread routines don't return anything.
+        join = pthread_join(directoryTID[i], (void **)&retval); // thread routines don't return anything.
         if(join != 0){
             perror("Error joining directory thread");
             exit(EXIT_FAILURE);
         }
+        if (retval==EXIT_FAILURE) {
+            err_flag = 1;
+        }
     }
     for(int i=0; i < no_file_threads; i++){
-        join = pthread_join(filesTID[i], NULL); // thread routines don't return anything.
+        join = pthread_join(filesTID[i], (void **)&retval); // thread routines don't return anything.
         if(join != 0){
             perror("Error joining directory thread");
             exit(EXIT_FAILURE);
+        }
+        if (retval==EXIT_FAILURE) {
+            err_flag = 1;
         }
     }
 

@@ -16,6 +16,7 @@
 #include "debugger.h"
 
 void *dir_thread_routine(void *arg){
+    int is_err = 0;
 #ifdef DEBUG
         fprintf(stdout, "dir_thread_routine %lu started\n", pthread_self());
 #endif
@@ -68,7 +69,10 @@ void *dir_thread_routine(void *arg){
                                         perror("ERROR!!!");
                                         exit(EXIT_FAILURE);
                                 }
-                                return 0;
+                                if (is_err) {
+                                    return (void *) EXIT_FAILURE;
+                                }
+                                return (void *) EXIT_SUCCESS;
                         }
                         /** this thread was not the last thread, therefore it does not know if any other directory threads
                          * will add anything to the queue. This thread must sleep until awoken
@@ -88,7 +92,10 @@ void *dir_thread_routine(void *arg){
                                         perror("ERROR!!!");
                                         exit(EXIT_FAILURE);
                                 }
-                                return 0;
+                                if (is_err) {
+                                    return (void *) EXIT_FAILURE;
+                                }
+                                return (void *) EXIT_SUCCESS;
                         }
                         no_waiting_dirs -= 1;
                 }
@@ -120,7 +127,9 @@ void *dir_thread_routine(void *arg){
 #ifdef DEBUG
                 fprintf(stdout, "\t%lu: dir->name: %s, file_suffix: %s\n", pthread_self(), dir->name, file_suffix);
 #endif
-                directoryFunction_r(dir->name, files, dirs, file_suffix);
+                if(directoryFunction_r(dir->name, files, dirs, file_suffix)==EXIT_FAILURE) {
+                    is_err = 1;
+                }
 
                 /** flags to track if anything added to their respective queues */
                 int dirs_added = 0;
@@ -214,6 +223,7 @@ void *dir_thread_routine(void *arg){
 }
 
 void *file_thread_routine(void *arg){
+    int is_err = 0;
         int mutex_status = 0;
         /** initialize the stringbuf here to save the amount of memory allocations needed */
         stringbuf *list = sb_create(10);
@@ -245,7 +255,10 @@ void *file_thread_routine(void *arg){
                                         exit(EXIT_FAILURE);
                                 }
                                 sb_destroy(list);
-                                return 0;
+                                if (is_err) {
+                                    return (void *) EXIT_FAILURE;
+                                }
+                                return (void *) EXIT_SUCCESS;
                         }
                         /** if the above is not seen, then the file thread cannot know if it must truly be terminated just yet, therefore
                          * it should sleep until awoken, either because the directory thread added to the file queue, or because
@@ -267,7 +280,10 @@ void *file_thread_routine(void *arg){
                                         exit(EXIT_FAILURE);
                                 }
                                 sb_destroy(list);
-                                return 0;
+                                if (is_err) {
+                                    return (void *) EXIT_FAILURE;
+                                }
+                                return (void *) EXIT_SUCCESS;
                         }
                 }
                 mutex_status = pthread_mutex_unlock(&file_term_mutex);
@@ -299,7 +315,7 @@ void *file_thread_routine(void *arg){
                 /** could not open the file */
                 if (fd == -1) {
                         perror(file->name);
-                        err_flag = 1;
+                        is_err = 1;
                         continue;
                 }
 
@@ -341,5 +357,8 @@ void *file_thread_routine(void *arg){
 
         /** stringbuffer has no purpose, as the file thread must now terminate */
         sb_destroy(list);
-        return (void *) 0;
+        if (is_err) {
+            return (void *) EXIT_FAILURE;
+        }
+        return (void *) EXIT_SUCCESS;
 }

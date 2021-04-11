@@ -19,11 +19,11 @@
     Return: we populate files and dirs by having a pointer to them, nothing returned.
 */
 int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileSuffix){
+    int err_flag = 0;
     DIR* dirp = opendir(dequeuedItem);
     // Check if we have perms to read it.
     if(dirp == NULL){
         perror(dequeuedItem);
-        err_flag = 1;
         return EXIT_FAILURE;
     }
 
@@ -99,6 +99,9 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
     }
     closedir(dirp);
     free(dequeuedItem);
+    if (err_flag) {
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 
