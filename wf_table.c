@@ -20,9 +20,6 @@ unsigned long hash_func(char *word){
 int hash_insert(wf_table *table, char *word) {
         unsigned long hash = hash_func(word);
         int idx = (int)((hash) % table->no_rows);
-#ifdef DEBUG
-        fprintf(stdout, "inserting %s at index %d\n", word, idx);
-#endif
         wf_item *row = table->data[idx];
         /** if the row is empty, then just put it as the head */
         if (!row) {
@@ -238,7 +235,6 @@ int hash_lexical_list(wf_table *table) {
                         }
                 }
         }
-        fprintf(stdout, "text: %s, j is :%d, no_entries: %d\n",table->file_name, j, table->no_entries);
         qsort((void *)(table->list), table->no_entries, sizeof(wf_item *), wf_item_comparator);
         return EXIT_SUCCESS;
 }
