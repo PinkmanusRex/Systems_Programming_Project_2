@@ -15,7 +15,7 @@ collection_threads.o: collection_threads.c collection_threads.h extern_module.h 
 debugger.o: debugger.c debugger.h wf_repo.h wf_table.h
 	$(CC) $(CFLAGS) -c $<
 
-helperR.o: helperR.c helperR.h debugger.h
+helperR.o: helperR.c helperR.h debugger.h extern_module.h
 	$(CC) $(CFLAGS) -c $<
 
 jsd.o: jsd.c jsd.h debugger.h
@@ -51,7 +51,7 @@ dcollection_threads.o: collection_threads.c collection_threads.h extern_module.h
 ddebugger.o: debugger.c debugger.h wf_repo.h wf_table.h
 	$(CC) -c $(CFLAGS) -DDEBUG -o $@ $<
 
-dhelperR.o: helperR.c helperR.h debugger.h
+dhelperR.o: helperR.c helperR.h debugger.h extern_module.h
 	$(CC) -c $(CFLAGS) -DDEBUG -o $@ $<
 
 djsd.o: jsd.c jsd.h debugger.h

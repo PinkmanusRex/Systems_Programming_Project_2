@@ -9,6 +9,7 @@
 #include <sys/types.h> 
 #include <dirent.h>
 #include "helperR.h"
+#include "extern_module.h"
 
 /* The only item we can dequeue from a Directory Queue is a directory
     Parameter dequeuedItem refers to the name of the directory dequeued.
@@ -22,10 +23,9 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
     // Check if we have perms to read it.
     if(dirp == NULL){
         perror(dequeuedItem);
+        err_flag = 1;
         return EXIT_FAILURE;
     }
-
-    errno = 0;
 
     struct dirent* entry; // This structure may be statically allocated. Don't attempt to free it. man 3 readdir
     struct stat entryStat; // temporary stat struct for each entry read from directory stream in loop.
@@ -48,6 +48,7 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
         if(statReturn == -1) {
             perror(currentPath);
             free(currentPath);
+            err_flag = 1;
             continue;
         }
 
@@ -59,6 +60,7 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
             if(inputFD == -1){
                 perror(currentPath);
                 free(currentPath);
+                err_flag = 1;
                 continue;
             }
             close(inputFD);
@@ -81,6 +83,7 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
             if(temporaryCheckForPerms == NULL){
                 perror(currentPath);
                 free(currentPath);
+                err_flag = 1;
                 continue;
             }
             closedir(temporaryCheckForPerms);

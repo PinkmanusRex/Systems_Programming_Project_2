@@ -43,6 +43,7 @@ unsigned int jsd_comp_iter;
 unsigned int jsd_total_comp;
 jsd_entry **jsd_list;
 pthread_mutex_t analysis_mutex;
+int err_flag;
 
 #ifdef DEBUG
 pthread_mutex_t jsd_sync_mutex;
@@ -111,6 +112,7 @@ int initializeOptions(int numArgs, char** Args){
 }
 
 int main(int argc, char** argv){
+        err_flag = 0;
     /* Will not need mutex to check flags */
     /* Options can be given in any order, any # of times
         The last flag overwrites the value.
@@ -165,6 +167,7 @@ int main(int argc, char** argv){
         if(stat(argv[i], &argumentData) == -1){
             // argv[i] doesn't exist 
             perror(argv[i]);
+            err_flag = 1;
             continue;
         }
 
@@ -179,6 +182,7 @@ int main(int argc, char** argv){
             if(inputFD == -1){
                 perror(pathname);
                 free(pathname);  // important because we aren't exiting.
+                err_flag = 1;
                 continue;
             }
             close(inputFD);
@@ -186,9 +190,9 @@ int main(int argc, char** argv){
             // Add to file Queue
             siphonedToFileQueue = sync_q_add(file_queue, pathname);
             if(siphonedToFileQueue == EXIT_FAILURE){
-                fprintf(stderr, "sync_q library line 62");
+                fprintf(stderr, "sync_q_add malloc failure!");
                 free(pathname);
-                continue;
+                exit(EXIT_FAILURE);
             }
         }
         else if(S_ISDIR(argumentData.st_mode)){
@@ -197,6 +201,7 @@ int main(int argc, char** argv){
             if(temporaryCheckForPerms == NULL){
                 perror(pathname);
                 free(pathname);
+                err_flag = 1;
                 continue;
             }
             closedir(temporaryCheckForPerms);
@@ -204,9 +209,9 @@ int main(int argc, char** argv){
             // Add to directoryQueue
             siphonedToDirQueue = sync_q_add(directory_queue, pathname);
             if(siphonedToDirQueue == EXIT_FAILURE){
-                fprintf(stderr, "sync_q library line 62");
+                fprintf(stderr, "sync_q_add malloc failure!");
                 free(pathname);
-                continue;
+                exit(EXIT_FAILURE);
             }
         }
         else{
@@ -284,6 +289,7 @@ int main(int argc, char** argv){
         exit(EXIT_FAILURE);
     }
 
+    // set up the global file_suffix to point to the suffix string so that all functions have access to it
     file_suffix = suffix;
     
     /* Create directory and file threads, and pass in their routines */
@@ -376,7 +382,6 @@ int main(int argc, char** argv){
      *  analysis phase, where the number of analysis threads should not exceed the number of comparisons (1/2)(n)(n-1)
      *  once analysis threads all finish, the final array of jsd results must be quicksorted utilizing the provided jsd_comparator
      */
-     int err_flag = 0;
      if (wf_stack->size >= 2) {
              x = wf_stack->table;
              y = x->next;
@@ -438,6 +443,13 @@ int main(int argc, char** argv){
      */
      wf_repo_clear(wf_stack);
      wf_repo_destroy(wf_stack);
+#ifdef DEBUG
+     int exit_code = EXIT_SUCCESS;
+     if (err_flag) {
+             exit_code = EXIT_FAILURE;
+     }
+     fprintf(stdout, "exit_code: %d\n", exit_code);
+#endif
 
      if (err_flag) {
              return EXIT_FAILURE;

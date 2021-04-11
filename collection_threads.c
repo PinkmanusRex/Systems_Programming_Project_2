@@ -135,7 +135,7 @@ void *dir_thread_routine(void *arg){
                 /** add the directories to the directory queue */
                 while (dirs_ptr->value != 0) {
                         if (sync_q_add(directory_queue, dirs_ptr->value)==EXIT_FAILURE){
-                                fprintf(stderr, "MALLOC FAILURE!!!");
+                                fprintf(stderr, "SYNC_Q_ADD MALLOC FAILURE!!!");
                                 exit(EXIT_FAILURE);
                         }
                         dirs_added = 1;
@@ -166,7 +166,7 @@ void *dir_thread_routine(void *arg){
                 /** add the files to the file queue */
                 while (files_ptr->value != 0) {
                         if (sync_q_add(file_queue, files_ptr->value)==EXIT_FAILURE){
-                                fprintf(stderr, "MALLOC FAILURE!!!");
+                                fprintf(stderr, "SYNC_Q_ADD MALLOC FAILURE!!!");
                                 exit(EXIT_FAILURE);
                         }
                         files_added = 1;
@@ -296,8 +296,10 @@ void *file_thread_routine(void *arg){
                         exit(EXIT_FAILURE);
                 }
 
+                /** could not open the file */
                 if (fd == -1) {
                         perror(file->name);
+                        err_flag = 1;
                         continue;
                 }
 
@@ -339,5 +341,5 @@ void *file_thread_routine(void *arg){
 
         /** stringbuffer has no purpose, as the file thread must now terminate */
         sb_destroy(list);
-        return 0;
+        return (void *) 0;
 }
