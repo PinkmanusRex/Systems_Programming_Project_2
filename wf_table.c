@@ -104,6 +104,7 @@ int hash_rehash(wf_table *table){
         }
         /** free the old table since it won't be used anymore, and replace it with the new table */
         free(table->data);
+        table->no_rows = new_no_rows;
         table->data = new_data;
         return EXIT_SUCCESS;
 }
@@ -237,6 +238,7 @@ int hash_lexical_list(wf_table *table) {
                         }
                 }
         }
+        fprintf(stdout, "text: %s, j is :%d, no_entries: %d\n",table->file_name, j, table->no_entries);
         qsort((void *)(table->list), table->no_entries, sizeof(wf_item *), wf_item_comparator);
         return EXIT_SUCCESS;
 }
