@@ -126,7 +126,7 @@ int main(int argc, char** argv){
     strcpy(suffix, ".txt");
 
     if(initializeOptions(argc, argv) == EXIT_FAILURE){
-        fprintf(stderr, "Invalid -option arguments, program halt & terminated");
+        fprintf(stderr, "Invalid -option arguments, program halt & terminated\n");
         free(suffix);
         exit(EXIT_FAILURE);
     }
@@ -149,7 +149,7 @@ int main(int argc, char** argv){
     wf_stack = wf_repo_create();
 
     if(directory_queue == NULL || file_queue == NULL || wf_stack == NULL){
-        fprintf(stderr, "Failure to initialize a syncronized queue (file and/or directory and/or wf repo)");
+        fprintf(stderr, "Failure to initialize a syncronized queue (file and/or directory and/or wf repo)\n");
         exit(EXIT_FAILURE);
     }
 
@@ -190,7 +190,7 @@ int main(int argc, char** argv){
             // Add to file Queue
             siphonedToFileQueue = sync_q_add(file_queue, pathname);
             if(siphonedToFileQueue == EXIT_FAILURE){
-                fprintf(stderr, "sync_q_add malloc failure!");
+                fprintf(stderr, "sync_q_add malloc failure!\n");
                 free(pathname);
                 exit(EXIT_FAILURE);
             }
@@ -209,7 +209,7 @@ int main(int argc, char** argv){
             // Add to directoryQueue
             siphonedToDirQueue = sync_q_add(directory_queue, pathname);
             if(siphonedToDirQueue == EXIT_FAILURE){
-                fprintf(stderr, "sync_q_add malloc failure!");
+                fprintf(stderr, "sync_q_add malloc failure!\n");
                 free(pathname);
                 exit(EXIT_FAILURE);
             }
@@ -221,7 +221,7 @@ int main(int argc, char** argv){
 
         // There is no point in moving on if nothing further to do.
     if(sync_q_empty(file_queue) && sync_q_empty(directory_queue)){
-        fprintf(stderr, "main thread did not populate queues. Terminating");
+        fprintf(stderr, "main thread did not populate queues. Terminating\n");
         sync_q_destroy(directory_queue); sync_q_destroy(file_queue);
         free(suffix);
         exit(EXIT_FAILURE);
