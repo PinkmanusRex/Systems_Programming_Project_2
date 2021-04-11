@@ -10,9 +10,6 @@
 #include "debugger.h"
 
 int tokenize(int fd, wf_table *table, stringbuf *list) {
-        if (DEBUG) {
-            fprintf(stdout, "The wf_table: %s, and it's row count is %d\n", table->file_name, table->no_rows);
-        }
         enum word_states word_state = wEmpty;
         int bytesRead = 0;
         char inter_buf[50];
@@ -41,9 +38,6 @@ int tokenize(int fd, wf_table *table, stringbuf *list) {
                         }
                         if (word_state==wComplete) {
                                 char *word = sb_get_lower_word(list);
-                                if (DEBUG) {
-                                        fprintf(stdout, "%s\n", word);
-                                }
                                 /** if word is null, that means malloc failed */
                                 if (!word) {
                                         return EXIT_FAILURE;
@@ -60,9 +54,6 @@ int tokenize(int fd, wf_table *table, stringbuf *list) {
         }
         if (word_state==wIncomplete) {
                 char *word = sb_get_lower_word(list);
-                if (DEBUG) {
-                        fprintf(stdout, "%s\n", word);
-                }
                 if (!word) {
                         return EXIT_FAILURE;
                 }
@@ -76,10 +67,5 @@ int tokenize(int fd, wf_table *table, stringbuf *list) {
         }
         hash_comp_freq(table);
         free(table->data);
-        if (DEBUG) {
-            for (int i = 0; i < table->no_entries; i += 1) {
-                fprintf(stdout, "entry[%d] = %s\n", i, table->list[i]->word);
-            }
-        }
         return EXIT_SUCCESS;
 }

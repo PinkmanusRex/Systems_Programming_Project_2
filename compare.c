@@ -116,7 +116,7 @@ int main(int argc, char** argv){
         The last flag overwrites the value.
     */
     if(argc < 2){
-        perror("Provide a file or directory.");
+        fprintf(stderr, "Provide a file or directory.");
         return EXIT_FAILURE;
     }
 
@@ -124,7 +124,7 @@ int main(int argc, char** argv){
     strcpy(suffix, ".txt");
 
     if(initializeOptions(argc, argv) == EXIT_FAILURE){
-        fprintf(stdout, "Invalid -option arguments, program halt & terminated");
+        fprintf(stderr, "Invalid -option arguments, program halt & terminated");
         free(suffix);
         exit(EXIT_FAILURE);
     }
@@ -147,7 +147,7 @@ int main(int argc, char** argv){
     wf_stack = wf_repo_create();
 
     if(directory_queue == NULL || file_queue == NULL || wf_stack == NULL){
-        perror("Failure to initialize a syncronized queue (file and/or directory and/or wf repo)");
+        fprintf(stderr, "Failure to initialize a syncronized queue (file and/or directory and/or wf repo)");
         exit(EXIT_FAILURE);
     }
 
@@ -186,7 +186,7 @@ int main(int argc, char** argv){
             // Add to file Queue
             siphonedToFileQueue = sync_q_add(file_queue, pathname);
             if(siphonedToFileQueue == EXIT_FAILURE){
-                perror("sync_q library line 62");
+                fprintf(stderr, "sync_q library line 62");
                 free(pathname);
                 continue;
             }
@@ -204,7 +204,7 @@ int main(int argc, char** argv){
             // Add to directoryQueue
             siphonedToDirQueue = sync_q_add(directory_queue, pathname);
             if(siphonedToDirQueue == EXIT_FAILURE){
-                perror("sync_q library line 62");
+                fprintf(stderr, "sync_q library line 62");
                 free(pathname);
                 continue;
             }
@@ -216,7 +216,7 @@ int main(int argc, char** argv){
 
         // There is no point in moving on if nothing further to do.
     if(sync_q_empty(file_queue) && sync_q_empty(directory_queue)){
-        perror("main thread did not populate queues. Terminating");
+        fprintf(stderr, "main thread did not populate queues. Terminating");
         sync_q_destroy(directory_queue); sync_q_destroy(file_queue);
         free(suffix);
         exit(EXIT_FAILURE);
