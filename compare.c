@@ -138,7 +138,7 @@ int main(int argc, char** argv){
     strcpy(suffix, ".txt");
 
     if(initializeOptions(argc, argv) == EXIT_FAILURE){
-        fprintf(stderr, "Invalid -option arguments, program halt & terminated\n");
+        fprintf(stderr, "Invalid -option arguments: may only use -dN, -fN, -aN, or -sS as options, where N are positive integers and S is a suffix\n");
         free(suffix);
         exit(EXIT_FAILURE);
     }
