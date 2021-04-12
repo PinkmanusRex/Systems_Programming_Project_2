@@ -23,8 +23,8 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
     DIR* dirp = opendir(dequeuedItem);
     // Check if we have perms to read it.
     if(dirp == NULL){
-        perror(dequeuedItem);
-        return EXIT_FAILURE;
+    perror(dequeuedItem);
+    return EXIT_FAILURE;
     }
 
     struct dirent* entry; // This structure may be statically allocated. Don't attempt to free it. man 3 readdir
@@ -43,7 +43,7 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
 #ifdef DEBUG
         fprintf(stdout, "currentPath: %s\n", currentPath);
 #endif
-        
+    
         statReturn = stat(currentPath, &entryStat); // Variety of reasons -> man 2 stat
         if(statReturn == -1) {
             perror(currentPath);
@@ -58,18 +58,18 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
             // If we can't open it continue forward.
             int inputFD = open(currentPath, O_RDONLY);
             if(inputFD == -1){
-                perror(currentPath);
-                free(currentPath);
-                err_flag = 1;
-                continue;
+            perror(currentPath);
+            free(currentPath);
+            err_flag = 1;
+            continue;
             }
             close(inputFD);
-            
+        
             if(endsWithSuffix(fileSuffix, currentPath) == 0){
                 free(currentPath);
                 continue;
             }
-            
+        
             // If we can open it and has matching suffix then add it to files
             Node* temp = (Node *)malloc(sizeof(Node));
             temp->value = files->value;
@@ -87,8 +87,7 @@ int directoryFunction_r(char* dequeuedItem, Node* files, Node* dirs, char* fileS
                 continue;
             }
             closedir(temporaryCheckForPerms);
-            
-
+        
             // Add currentPath to dir linkedlist.
             Node* temp = (Node *)malloc(sizeof(Node));
             temp->value = dirs->value;
@@ -117,15 +116,13 @@ int endsWithSuffix(char* fileSuffix, char* fileName){
             return 0;
         }
     }
-
     return 1;
 }
 
 /*  Generate file path relative to current working directory for deqeued item 
     Implicitly reentrant
 */
-char* generateFilePath(char* directoryName, char* currPath)
-{
+char* generateFilePath(char* directoryName, char* currPath){
     strbuf_t path;
     sb_initk(&path, 10);
     sb_concatk(&path, directoryName);
@@ -165,12 +162,11 @@ int sb_initk(strbuf_t *sb, size_t length)
 
 int sb_removek(strbuf_t *sb, char* item){
     // if nothing to remove, can't return anything
-    if(sb->used == 0)
-        return 1;
+    if(sb->used == 0) return 1;
     
     --sb->used;
     if (item)
-        *item = sb->data[sb->used];
+    *item = sb->data[sb->used];
 
     sb->data[sb->used] = '\0';
     return 0;
@@ -183,9 +179,9 @@ void sb_destroyk(strbuf_t *sb)
 
 int sb_appendk(strbuf_t *sb, char item){
     if((sb->used+1) == sb->length){
-        size_t size = sb->length * 2;
-        char *p = realloc(sb->data, sizeof(char)* size);
-        if(!p) return 1;
+    size_t size = sb->length * 2;
+    char *p = realloc(sb->data, sizeof(char)* size);
+    if(!p) return 1;
         // successful
         sb->data = p;
         sb->length = size;
@@ -210,8 +206,6 @@ int sb_concatk(strbuf_t *sb, char *str){
         // successful
         sb->data = p;
         sb->length = size;
-        //if (DEBUG) idk what this is for
-        //    printf("Increased size to %lu\n", size);
     }
     
     int count = 0;
@@ -227,25 +221,25 @@ int sb_concatk(strbuf_t *sb, char *str){
 int sb_insertk(strbuf_t *sb, int index, char item){
     if(index <= sb->used){
         ++sb->used;
-        if(sb->used == sb->length){
-            size_t size = 2*sb->length;
-            char *p = realloc(sb->data, sizeof(char)* size);
-            if(!p) return 1;
-            // successful
-            sb->data = p;
-            sb->length = size;
-        } // we have enough space to shift everything over
+    if(sb->used == sb->length){
+        size_t size = 2*sb->length;
+        char *p = realloc(sb->data, sizeof(char)* size);
+        if(!p) return 1;
+        // successful
+        sb->data = p;
+        sb->length = size;
+    } // we have enough space to shift everything over
     
-        sb->data[sb->used] = '\0';
-        // start from index, shift everything over until you get to null term
-        char temp;
-        for(int i=index; i<sb->used; i++){
-            temp = sb->data[i];
-            sb->data[i] = item;
-            item = temp;
-        }
-        
-        return 0;
+    sb->data[sb->used] = '\0';
+    // start from index, shift everything over until you get to null term
+    char temp;
+    for(int i=index; i<sb->used; i++){
+        temp = sb->data[i];
+        sb->data[i] = item;
+        item = temp;
+    }
+    
+    return 0;
     }
     else{ // we know that index > used
         if((index+1) >= (2*sb->length)){

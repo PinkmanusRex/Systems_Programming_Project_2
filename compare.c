@@ -55,7 +55,6 @@ unsigned int getDigits(char* toConvert){
             return 0;
         }
     }
-    
     unsigned int result = atoi(&toConvert[2]);
     return result;
 }
@@ -75,26 +74,31 @@ int initializeOptions(int numArgs, char** Args){
 
             char optionFlag = current[1];
             if(optionFlag == 'd'){
-                if(lengthOfCurrent == 2){return EXIT_FAILURE;}
+                if(lengthOfCurrent == 2){
+                    return EXIT_FAILURE;
+                }
                 dN = getDigits(current);
                 if(dN == 0){
                     return EXIT_FAILURE;
                 }
             }
             else if(optionFlag == 'f'){
-                if(lengthOfCurrent == 2){return EXIT_FAILURE;}
+                if(lengthOfCurrent == 2){
+                    return EXIT_FAILURE;
+                }
                 fN = getDigits(current);
                 if(fN == 0){
                     return EXIT_FAILURE;
                 }
             }
             else if(optionFlag == 'a'){
-                if(lengthOfCurrent == 2){return EXIT_FAILURE;}
+                if(lengthOfCurrent == 2){
+                    return EXIT_FAILURE;
+                }
                 aN = getDigits(current);
                 if(aN == 0){
                     return EXIT_FAILURE;
                 }
-
             }
             else if(optionFlag == 's'){
                 free(suffix);
@@ -115,10 +119,10 @@ int main(int argc, char** argv){
     int err_flag = 0;
     /* Will not need mutex to check flags */
     /* Options can be given in any order, any # of times
-        The last flag overwrites the value.
+    The last flag overwrites the value.
     */
     if(argc < 2){
-        fprintf(stderr, "Provide a file or directory.");
+        fprintf(stderr, "Provide a file or directory.\n");
         return EXIT_FAILURE;
     }
 
@@ -158,8 +162,8 @@ int main(int argc, char** argv){
     int siphonedToFileQueue;
     int siphonedToDirQueue;
     for(int i=1; i<argc; ++i){
-        /* I allow argv arguments to start with a .
-            For example: ./compare ../ is a valid argument*/
+    /* I allow argv arguments to start with a .
+        For example: ./compare ../ is a valid argument*/
 
         if(argv[i][0] == '-'){
             continue; // options have already been initialized.
@@ -175,7 +179,7 @@ int main(int argc, char** argv){
         // We can move onto siphoning to respective queue provided it has read permissions.
         char* pathname = (char *) malloc(sizeof(char) * strlen(argv[i]) + 2);
         strcpy(pathname, argv[i]); // Needed since directoryFunction_r frees.
-        
+    
         if(S_ISREG(argumentData.st_mode)){
             // If we can't open the regular file, continue forward.
             int inputFD = open(pathname, O_RDONLY);
@@ -186,7 +190,7 @@ int main(int argc, char** argv){
                 continue;
             }
             close(inputFD);
-            
+        
             // Add to file Queue
             siphonedToFileQueue = sync_q_add(file_queue, pathname);
             if(siphonedToFileQueue == EXIT_FAILURE){
@@ -219,7 +223,7 @@ int main(int argc, char** argv){
         }
     }
 
-        // There is no point in moving on if nothing further to do.
+    // There is no point in moving on if nothing further to do.
     if(sync_q_empty(file_queue) && sync_q_empty(directory_queue)){
         fprintf(stderr, "main thread did not populate queues. Terminating\n");
         sync_q_destroy(directory_queue); sync_q_destroy(file_queue);
@@ -237,34 +241,34 @@ int main(int argc, char** argv){
     
     // Initialize relevant extern mutexes and conditional vars
     if(pthread_mutex_init(&dir_term_mutex, NULL) != 0) {
-            perror("mutex init failure"); 
-            exit(EXIT_FAILURE);
+        perror("mutex init failure"); 
+        exit(EXIT_FAILURE);
     }
     
     if(pthread_mutex_init(&file_term_mutex, NULL) != 0) {
-            perror("mutex init failure"); 
-            exit(EXIT_FAILURE);
+        perror("mutex init failure"); 
+        exit(EXIT_FAILURE);
     }
 
     if(pthread_cond_init(&cond_dir, NULL) != 0) {
-            perror("cond init failure"); 
-            exit(EXIT_FAILURE);
+        perror("cond init failure"); 
+        exit(EXIT_FAILURE);
     }
     
     if(pthread_cond_init(&cond_file, NULL) != 0) {
-            perror("cond init failure"); 
-            exit(EXIT_FAILURE);
+        perror("cond init failure"); 
+        exit(EXIT_FAILURE);
     }
 
     if (pthread_mutex_init(&analysis_mutex, NULL) != 0) {
-            perror("mutex init failure"); 
-            exit(EXIT_FAILURE);
+        perror("mutex init failure"); 
+        exit(EXIT_FAILURE);
     }
 
 #ifdef DEBUG
     if (pthread_mutex_init(&jsd_sync_mutex, NULL) != 0) {
-            perror("utex init failure");
-            exit(EXIT_FAILURE);
+        perror("utex init failure");
+        exit(EXIT_FAILURE);
     }
 #endif
 
@@ -297,7 +301,7 @@ int main(int argc, char** argv){
     for(int i=0; i < no_dir_threads; i++){
         // check to make sure that the last condition is true, our file_queue/dir_queue are global so I pass NULL
         create = pthread_create(&directoryTID[i], NULL, dir_thread_routine, NULL); 
-        if(create != 0){
+        if (create != 0){
             perror("Error creating directory thread");
             exit(EXIT_FAILURE);
         }
@@ -305,13 +309,13 @@ int main(int argc, char** argv){
     for(int i=0; i < no_file_threads; i++){
         // check to make sure that the last condition is true, our file_queue/dir_queue are global so I pass NULL
         create = pthread_create(&filesTID[i], NULL, file_thread_routine, NULL); 
-        if(create != 0){
+        if (create != 0){
             perror("Error creating file thread");
             exit(EXIT_FAILURE);
         }
     }
 
-        /* !! Wait for directory threads and file threads to do their job !! */
+    /* !! Wait for directory threads and file threads to do their job !! */
     int join;
     for(int i=0; i < no_dir_threads; i++){
         join = pthread_join(directoryTID[i], (void **)&retval); // thread routines don't return anything.
@@ -337,8 +341,8 @@ int main(int argc, char** argv){
     // Now that they are done doing their work, we can free memory allocated for their jobs.
     // But first ensure they are empty.
     if(!(sync_q_empty(file_queue) && sync_q_empty(directory_queue))){
-        fprintf(stdout, "No items in file queue: %d, No items in directory queue: %d\n", file_queue->entries, directory_queue->entries);
-        perror("Something went wrong in routines.");
+        fprintf(stderr, "No items in file queue: %d, No items in directory queue: %d\n", file_queue->entries, directory_queue->entries);
+        fprintf(stderr, "Something went wrong in routines.\n");
         free(suffix);
         exit(EXIT_FAILURE);
     }
@@ -389,57 +393,57 @@ int main(int argc, char** argv){
      *  once analysis threads all finish, the final array of jsd results must be quicksorted utilizing the provided jsd_comparator
      */
      if (wf_stack->size >= 2) {
-             x = wf_stack->table;
-             y = x->next;
-             jsd_comp_iter = 0;
-             jsd_total_comp = wf_stack->size * (wf_stack->size - 1) / 2;
-             jsd_list = jsd_create_list(jsd_total_comp);
-             if (!jsd_list) {
-                     fprintf(stderr, "malloc failure: could not allocate space for jsd_list\n");
-                     exit(EXIT_FAILURE);
+         x = wf_stack->table;
+         y = x->next;
+         jsd_comp_iter = 0;
+         jsd_total_comp = wf_stack->size * (wf_stack->size - 1) / 2;
+         jsd_list = jsd_create_list(jsd_total_comp);
+         if (!jsd_list) {
+             fprintf(stderr, "malloc failure: could not allocate space for jsd_list\n");
+             exit(EXIT_FAILURE);
+         }
+         if (aN > jsd_total_comp) {
+             aN = jsd_total_comp;
+         }
+         pthread_t *analysisTID = malloc(sizeof(pthread_t) * aN);
+         if (!analysisTID) {
+             fprintf(stderr, "malloc failure: could not allocate space for analysis thread array\n");
+             exit(EXIT_FAILURE);
+         }
+         int create = 0;
+         for (int i = 0; i < aN; i += 1) {
+             create = pthread_create(&analysisTID[i], NULL, analysis_thread_routine, NULL);
+             if (create != 0) {
+                 perror("error creating analysis thread");
+                 exit(EXIT_FAILURE);
              }
-             if (aN > jsd_total_comp) {
-                     aN = jsd_total_comp;
+         }
+         int join = 0;
+         for (int i = 0; i < aN; i += 1) {
+             join = pthread_join(analysisTID[i], NULL);
+             if (join != 0) {
+                 perror("error joining analysis thread");
+                 exit(EXIT_FAILURE);
              }
-             pthread_t *analysisTID = malloc(sizeof(pthread_t) * aN);
-             if (!analysisTID) {
-                     fprintf(stderr, "malloc failure: could not allocate space for analysis thread array\n");
-                     exit(EXIT_FAILURE);
-             }
-             int create = 0;
-             for (int i = 0; i < aN; i += 1) {
-                     create = pthread_create(&analysisTID[i], NULL, analysis_thread_routine, NULL);
-                     if (create != 0) {
-                             perror("error creating analysis thread");
-                             exit(EXIT_FAILURE);
-                     }
-             }
-             int join = 0;
-             for (int i = 0; i < aN; i += 1) {
-                     join = pthread_join(analysisTID[i], NULL);
-                     if (join != 0) {
-                             perror("error joining analysis thread");
-                             exit(EXIT_FAILURE);
-                     }
-             }
-             free(analysisTID);
-             qsort((void *)(jsd_list), jsd_total_comp, sizeof(jsd_entry *), jsd_comparator);
-             jsd_print_list(jsd_list, jsd_total_comp);
-             jsd_destroy_list(jsd_list, jsd_total_comp);
+         }
+         free(analysisTID);
+         qsort((void *)(jsd_list), jsd_total_comp, sizeof(jsd_entry *), jsd_comparator);
+         jsd_print_list(jsd_list, jsd_total_comp);
+         jsd_destroy_list(jsd_list, jsd_total_comp);
      }
      else {
-             err_flag = 1;
+         err_flag = 1;
      }
      mutex_status = pthread_mutex_destroy(&analysis_mutex);
      if (mutex_status != 0) {
-             perror("mutex destroy error analysis_mutex");
-             exit(EXIT_FAILURE);
+         perror("mutex destroy error analysis_mutex");
+         exit(EXIT_FAILURE);
      }
 #ifdef DEBUG
      mutex_status = pthread_mutex_destroy(&jsd_sync_mutex);
      if (mutex_status != 0) {
-             perror("mutex destroy error jsd_sync_mutex");
-             exit(EXIT_FAILURE);
+         perror("mutex destroy error jsd_sync_mutex");
+         exit(EXIT_FAILURE);
      }
 #endif
 
@@ -452,13 +456,13 @@ int main(int argc, char** argv){
 #ifdef DEBUG
      int exit_code = EXIT_SUCCESS;
      if (err_flag) {
-             exit_code = EXIT_FAILURE;
+         exit_code = EXIT_FAILURE;
      }
      fprintf(stdout, "exit_code: %d\n", exit_code);
 #endif
 
      if (err_flag) {
-             return EXIT_FAILURE;
+         return EXIT_FAILURE;
      }
      return EXIT_SUCCESS;
 }
