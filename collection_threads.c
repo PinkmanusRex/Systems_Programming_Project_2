@@ -112,12 +112,12 @@ void *dir_thread_routine(void *arg){
 
         Node *files = malloc(sizeof(Node));
         if (!files) {
-            fprintf(stderr, "MALLOC FAILURE!!!");
+            perror("collection_threads.c: directory_thread_routine - MALLOC FAILURE!!!");
             exit(EXIT_FAILURE);
         }
         Node *dirs = malloc(sizeof(Node));
         if (!dirs) {
-            fprintf(stderr, "MALLOC FAILURE!!!");
+            perror("collection_threads.c: directory_thread_routine - MALLOC FAILURE!!!");
             exit(EXIT_FAILURE);
         }
         files->value = 0;
@@ -144,7 +144,7 @@ void *dir_thread_routine(void *arg){
         /** add the directories to the directory queue */
         while (dirs_ptr->value != 0) {
             if (sync_q_add(directory_queue, dirs_ptr->value)==EXIT_FAILURE){
-                fprintf(stderr, "SYNC_Q_ADD MALLOC FAILURE!!!");
+                perror("collection_threads.c: directory_thread_routine - SYNC_Q_ADD MALLOC FAILURE!!!");
                 exit(EXIT_FAILURE);
             }
             dirs_added = 1;
@@ -175,7 +175,7 @@ void *dir_thread_routine(void *arg){
         /** add the files to the file queue */
         while (files_ptr->value != 0) {
             if (sync_q_add(file_queue, files_ptr->value)==EXIT_FAILURE){
-                fprintf(stderr, "SYNC_Q_ADD MALLOC FAILURE!!!");
+                perror("collection_threads.c: directory_thread_routine - SYNC_Q_ADD MALLOC FAILURE!!!");
                 exit(EXIT_FAILURE);
             }
             files_added = 1;
@@ -228,7 +228,7 @@ void *file_thread_routine(void *arg){
     /** initialize the stringbuf here to save the amount of memory allocations needed */
     stringbuf *list = sb_create(10);
     if (!list) {
-        fprintf(stderr, "MALLOC FAILURE!!!");
+        perror("collection_threads.c: file_thread_routine - MALLOC FAILURE!!!");
         exit(EXIT_FAILURE);
     }
 #ifdef DEBUG
@@ -323,13 +323,13 @@ void *file_thread_routine(void *arg){
         wf_table *table = hash_create_table(file->name, 30, 3.0);
         if (!table) {
             /** something went wrong with malloc, so this is a major error */
-            fprintf(stderr, "MALLOC FAILURE!!!");
+            perror("wf_table.c: hash_create_table - MALLOC FAILURE!!!");
             exit(EXIT_FAILURE);
         }
 
         if (tokenize(fd, table, list)==EXIT_FAILURE) {
             /** something went wrong with malloc, so this is a major error */
-            fprintf(stderr, "MALLOC FAILURE!!!");
+            perror("tokenize.c: tokenize - MALLOC FAILURE!!!");
             exit(EXIT_FAILURE);
         }
 

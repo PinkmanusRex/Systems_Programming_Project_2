@@ -103,6 +103,10 @@ int initializeOptions(int numArgs, char** Args){
             else if(optionFlag == 's'){
                 free(suffix);
                 suffix = (char*) malloc(lengthOfCurrent * sizeof(char));
+                if (!suffix) {
+                    perror("compare.c: malloc error setting suffix!");
+                    exit(EXIT_FAILURE);
+                }
                 strcpy(suffix, (current+2));
             }
             else{
@@ -127,6 +131,10 @@ int main(int argc, char** argv){
     }
 
     suffix = malloc(10 * sizeof(char));
+    if (!suffix) {
+        perror("compare.c: malloc error setting suffix!");
+        exit(EXIT_FAILURE);
+    }
     strcpy(suffix, ".txt");
 
     if(initializeOptions(argc, argv) == EXIT_FAILURE){
@@ -178,6 +186,10 @@ int main(int argc, char** argv){
         // Now that we know argv[i] has a valid address and isn't an option flag
         // We can move onto siphoning to respective queue provided it has read permissions.
         char* pathname = (char *) malloc(sizeof(char) * strlen(argv[i]) + 2);
+        if (!pathname) {
+            perror("compare.c: malloc error setting pathname!");
+            exit(EXIT_FAILURE);
+        }
         strcpy(pathname, argv[i]); // Needed since directoryFunction_r frees.
     
         if(S_ISREG(argumentData.st_mode)){
@@ -194,7 +206,7 @@ int main(int argc, char** argv){
             // Add to file Queue
             siphonedToFileQueue = sync_q_add(file_queue, pathname);
             if(siphonedToFileQueue == EXIT_FAILURE){
-                fprintf(stderr, "sync_q_add malloc failure!\n");
+                perror("sync_q_add malloc failure!");
                 free(pathname);
                 exit(EXIT_FAILURE);
             }
@@ -213,7 +225,7 @@ int main(int argc, char** argv){
             // Add to directoryQueue
             siphonedToDirQueue = sync_q_add(directory_queue, pathname);
             if(siphonedToDirQueue == EXIT_FAILURE){
-                fprintf(stderr, "sync_q_add malloc failure!\n");
+                perror("sync_q_add malloc failure!");
                 free(pathname);
                 exit(EXIT_FAILURE);
             }
@@ -399,7 +411,7 @@ int main(int argc, char** argv){
          jsd_total_comp = wf_stack->size * (wf_stack->size - 1) / 2;
          jsd_list = jsd_create_list(jsd_total_comp);
          if (!jsd_list) {
-             fprintf(stderr, "malloc failure: could not allocate space for jsd_list\n");
+             perror("compare.c: malloc failure - could not allocate space for jsd_list");
              exit(EXIT_FAILURE);
          }
          if (aN > jsd_total_comp) {
@@ -407,7 +419,7 @@ int main(int argc, char** argv){
          }
          pthread_t *analysisTID = malloc(sizeof(pthread_t) * aN);
          if (!analysisTID) {
-             fprintf(stderr, "malloc failure: could not allocate space for analysis thread array\n");
+             perror("malloc failure: could not allocate space for analysis thread array");
              exit(EXIT_FAILURE);
          }
          int create = 0;
