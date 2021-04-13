@@ -444,6 +444,7 @@ int main(int argc, char** argv){
          jsd_destroy_list(jsd_list, jsd_total_comp);
      }
      else {
+         fprintf(stderr, "Fewer than 2 files found!\n");
          err_flag = 1;
      }
      mutex_status = pthread_mutex_destroy(&analysis_mutex);
