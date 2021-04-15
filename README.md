@@ -111,3 +111,6 @@ The main thread creates the analysis threads to execute the ```analysis_thread_r
 - After all analysis threads are properly reaped, the results would be have been printed to ```stdout```.
 
 - We compare these results printed to ```stdout```, using the ```jsd_check.py``` python script in python_helper. This script takes in two files and ouputs the JSD of them. We go through printed pairs in ```stdout``` (the results of our compare executable), and verify that the JSD of those pairs when passed to the ```jsd_check.py``` script is equivalent.
+
+## Using Python Helper:
+- ```word_freq_counter.py``` takes a file as an argument and produces ```file_freq.csv``` as an output. Two such csv's can then be inputted to ```jsd_check.py``` which will then print out the jsd results alongside some other information, such as kld. These can be checked against pairs in the ```./compare``` jsd outputs. Keep in mind rounding errors between the languages.

@@ -1,5 +1,6 @@
 #!/bin/bash
 # script for running some tests
+#word_freq_counter will output a <file_name>_freq.csv that can be input to jsd_check.py. jsd_check.py requires 2 csv files as arguments.
 python3 word_freq_counter.py test1.txt
 python3 word_freq_counter.py test2.txt
 python3 word_freq_counter.py test3.txt
