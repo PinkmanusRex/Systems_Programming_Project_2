@@ -1,4 +1,3 @@
-<::options parse_block_html="true" /}
 # Systems Programming Project 2: Plagiarism Checker
 ***
 
@@ -27,9 +26,8 @@
     ```sh
     $ ./dcompare -dN -fN -aN -sS <list of directories...> <list of files...>
     ```
-where ```-dN```, ```-fN```, and ```-aN``` specifies the number of directory threads the program should create respectively, and where ```-sS``` specifies the suffix of the files that files in the directories must end in to be valid for examination.
-    
-    Note: if ```-dN```, ```-fN```, or ```-aN``` are not specified, their respective number of threads will default to 1. As for ```-sS```, if that flag is not specified, the default suffix will be .txt
+&emsp;where ```-dN```, ```-fN```, and ```-aN``` specifies the number of directory threads the program should create respectively, and where ```-sS``` specifies the suffix of the files that files in the directories must end in to be valid for examination.  
+&emsp;&emsp;Note: if ```-dN```, ```-fN```, or ```-aN``` are not specified, their respective number of threads will default to 1. As for ```-sS```, if that flag is not specified, the default suffix will be .txt
 
 ***
 
