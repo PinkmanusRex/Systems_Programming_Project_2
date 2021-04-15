@@ -36,8 +36,8 @@ Note: if ```-dN```, ```-fN```, or ```-aN``` are not specified, their respective 
 
 There are three phases to the program:  
 &emsp;&emsp;1) Using the main thread to analyze options and send files/directories from the arguments to the file and directory queues respectively. This phase also initializes relevant global variables.  
-&emsp;&emsp;2) The Collection Phase where -f and -d number of threads are created to run the file and directory thread routines respectively.  
-&emsp;&emsp;3) The Analysis Phase where -a number of of threads are created to run the analysis thread routine. 
+&emsp;&emsp;2) The Collection Phase where ```-fN``` and ```-dN``` number of threads are created to run the file and directory thread routines respectively.  
+&emsp;&emsp;3) The Analysis Phase where ```-aN``` number of of threads are created to run the analysis thread routine. 
 
 Note: By compiling with the ```-DDEBUG``` flag, our program outputs various information which can be used to verify the correctness of a particular section of code. More on this in the collection and analysis test sections.
 
