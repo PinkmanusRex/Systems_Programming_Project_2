@@ -8,3 +8,4 @@ dcompare
 test1dir
 test2dir
 *.csv
+!readme.txt
